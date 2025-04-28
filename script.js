@@ -4,9 +4,11 @@
 const NOTES_STORAGE_KEY = 'startNotesData';
 const THEME_STORAGE_KEY = 'themePref';
 const SUGGESTION_BOX_ID = 'tag-suggestion-box';
+const DEBOUNCE_DELAY = 1500; // Delay for auto-save in milliseconds
 
 let notes = [];
 let isViewingArchived = false;
+let isViewingTrash = false;
 let sortableInstance = null;
 let activeTagInputElement = null;
 
@@ -38,6 +40,9 @@ const importNotesBtn = document.getElementById('import-notes-btn');
 const importFileInput = document.getElementById('import-file-input');
 const viewArchiveBtn = document.getElementById('view-archive-btn');
 const archiveStatusIndicator = document.getElementById('archive-status-indicator');
+const viewTrashBtn = document.getElementById('view-trash-btn');
+const trashStatusIndicator = document.getElementById('trash-status-indicator');
+const emptyTrashBtn = document.getElementById('empty-trash-btn');
 
 // =====================================================================
 //  Utility Functions
@@ -46,7 +51,6 @@ const parseTags = (tagString) => { if (!tagString) return []; return tagString.s
 const debounce = (func, delay) => { let timeoutId; return function(...args) { clearTimeout(timeoutId); timeoutId = setTimeout(() => { func.apply(this, args); }, delay); }; };
 const escapeRegExp = (string) => { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 const formatTimestamp = (timestamp) => { if (!timestamp) return ''; return new Date(timestamp).toLocaleString('vi-VN'); }
-// Helper to escape HTML (basic version)
 const escapeHTML = (str) => {
     if (!str) return '';
     return str.replace(/&/g, '&amp;')
@@ -75,7 +79,9 @@ const saveNotes = () => {
             pinned: note.pinned || false,
             lastModified: note.lastModified || note.id,
             archived: note.archived || false,
-            color: note.color || null
+            color: note.color || null,
+            deleted: note.deleted || false,
+            deletedTimestamp: note.deletedTimestamp || null
         }));
         localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesToSave));
     } catch (e) {
@@ -99,7 +105,9 @@ const loadNotes = () => {
                 pinned: note.pinned || false,
                 lastModified: note.lastModified || note.id,
                 archived: note.archived || false,
-                color: note.color || null
+                color: note.color || null,
+                deleted: note.deleted || false,
+                deletedTimestamp: note.deletedTimestamp || null
             }));
         } catch (e) {
             console.error("Lỗi đọc dữ liệu ghi chú từ localStorage:", e);
@@ -126,12 +134,14 @@ const addNote = () => {
             pinned: false,
             lastModified: now,
             archived: false,
-            color: null
+            color: null,
+            deleted: false
         };
-        notes.unshift(newNote); // Add to the beginning (respects manual order later)
+        notes.unshift(newNote);
         saveNotes();
-        if (isViewingArchived) {
+        if (isViewingArchived || isViewingTrash) {
             isViewingArchived = false;
+            isViewingTrash = false;
         }
         displayNotes(searchInput.value);
         hideAddPanel();
@@ -142,7 +152,7 @@ const addNote = () => {
 
 
 // =====================================================================
-//  Helper Functions & Event Handlers (Define before usage in displayNotes/setupListeners)
+//  Helper Functions & Event Handlers
 // =====================================================================
 
 const hideTagSuggestions = () => {
@@ -154,7 +164,6 @@ const hideTagSuggestions = () => {
     document.removeEventListener('mousedown', handleClickOutsideSuggestions);
 };
 
-// Defined here because hideTagSuggestions needs it.
 const handleClickOutsideSuggestions = (event) => {
     const suggestionBox = document.getElementById(SUGGESTION_BOX_ID);
     if (activeTagInputElement && suggestionBox &&
@@ -165,55 +174,178 @@ const handleClickOutsideSuggestions = (event) => {
     }
 };
 
+// --- Note Action Handlers ---
 const handleNotePin = (noteId, noteIndex) => {
     notes[noteIndex].pinned = !notes[noteIndex].pinned;
-    // No need to update lastModified just for pinning if we want to preserve manual order
-    // notes[noteIndex].lastModified = Date.now();
     saveNotes();
-    displayNotes(searchInput.value); // displayNotes will handle putting pinned notes first
+    displayNotes(searchInput.value);
 };
 
 const handleNoteDelete = (noteId, noteIndex) => {
     hideTagSuggestions();
+    notes[noteIndex].deleted = true;
+    notes[noteIndex].deletedTimestamp = Date.now();
+    notes[noteIndex].pinned = false;
+    notes[noteIndex].archived = false;
+    notes[noteIndex].lastModified = Date.now();
+    saveNotes();
+    displayNotes(searchInput.value);
+    if (!addNotePanel.classList.contains('hidden')) hideAddPanel();
+    else showAddPanelBtn.classList.remove('hidden');
+};
+
+const handleNoteRestore = (noteId, noteIndex) => {
+    notes[noteIndex].deleted = false;
+    delete notes[noteIndex].deletedTimestamp;
+    notes[noteIndex].lastModified = Date.now();
+    saveNotes();
+    displayNotes(searchInput.value);
+};
+
+const handleNoteDeletePermanent = (noteId, noteIndex) => {
     const noteIdentifier = notes[noteIndex].title || `ghi chú #${noteId}`;
-    const confirmMessage = `Bạn chắc chắn muốn xóa vĩnh viễn ${isViewingArchived ? 'ghi chú lưu trữ' : 'ghi chú'} "${noteIdentifier}"?`;
+    const confirmMessage = `Bạn chắc chắn muốn xóa vĩnh viễn ghi chú "${noteIdentifier}"? Hành động này không thể hoàn tác.`;
     if (confirm(confirmMessage)) {
-        notes.splice(noteIndex, 1); // Remove from array, preserves order of others
+        notes.splice(noteIndex, 1);
         saveNotes();
         displayNotes(searchInput.value);
-        if (!addNotePanel.classList.contains('hidden')) {
-            hideAddPanel();
-        } else {
-            showAddPanelBtn.classList.remove('hidden');
-        }
+    }
+};
+
+const handleEmptyTrash = () => {
+    const notesInTrash = notes.filter(note => note.deleted);
+    if (notesInTrash.length === 0) {
+        alert("Thùng rác trống.");
+        return;
+    }
+    const confirmMessage = `Bạn chắc chắn muốn xóa vĩnh viễn tất cả ${notesInTrash.length} ghi chú trong thùng rác? Hành động này không thể hoàn tác.`;
+    if (confirm(confirmMessage)) {
+        notes = notes.filter(note => !note.deleted);
+        saveNotes();
+        displayNotes(searchInput.value);
     }
 };
 
 const handleNoteArchive = (noteId, noteIndex) => {
     notes[noteIndex].archived = true;
-    notes[noteIndex].pinned = false; // Unpin when archiving
-    notes[noteIndex].lastModified = Date.now(); // Update modified time for archive action
+    notes[noteIndex].pinned = false;
+    notes[noteIndex].deleted = false;
+    notes[noteIndex].lastModified = Date.now();
     saveNotes();
     displayNotes(searchInput.value);
 };
 
 const handleNoteUnarchive = (noteId, noteIndex) => {
     notes[noteIndex].archived = false;
-    notes[noteIndex].lastModified = Date.now(); // Update modified time for unarchive action
-    // Decide where to put it? Add to top or bottom? Let's add to top for now.
+    notes[noteIndex].lastModified = Date.now();
     const noteToUnarchive = notes.splice(noteIndex, 1)[0];
     notes.unshift(noteToUnarchive);
     saveNotes();
     displayNotes(searchInput.value);
 };
 
+// --- Note Editing & Saving Logic ---
+
+/**
+ * Updates the data for a specific note and saves the notes array.
+ * @param {number} noteIndex - The index of the note in the notes array.
+ * @param {object} newData - An object containing the new data { title, text, tags, color }.
+ * @returns {boolean} - True if any data was actually changed and saved, false otherwise.
+ */
+const updateNoteData = (noteIndex, newData) => {
+    if (noteIndex < 0 || noteIndex >= notes.length) return false; // Index out of bounds check
+    const note = notes[noteIndex];
+    if (!note) return false;
+
+    const { title, text, tags, color } = newData;
+
+    const titleChanged = note.title !== title;
+    const textChanged = note.text !== text;
+    // Robust check for tags array change
+    const currentTags = note.tags || [];
+    const newTags = tags || [];
+    const tagsChanged = !(currentTags.length === newTags.length && currentTags.sort().every((value, index) => value === newTags.sort()[index]));
+    const colorChanged = note.color !== color;
+
+    const contentChanged = titleChanged || textChanged || tagsChanged;
+    const anyPropertyChanged = contentChanged || colorChanged;
+
+    if (anyPropertyChanged) {
+        note.title = title;
+        note.text = text;
+        note.tags = newTags;
+        note.color = color;
+
+        if (contentChanged) {
+            note.lastModified = Date.now();
+        }
+
+        saveNotes();
+        // console.log(`Note ${note.id} data updated`); // Optional log
+        return true;
+    }
+    return false;
+};
+
+
+const debouncedAutoSave = debounce((noteElement, noteIndex) => {
+    // Check if the edit elements still exist for this specific note
+    const editTitleInputCheck = noteElement.querySelector('input.edit-title-input');
+    const editInputCheck = noteElement.querySelector('textarea.edit-input');
+
+    if (!editInputCheck && !editTitleInputCheck) {
+        // console.log(`Auto-save for note ${noteIndex} aborted: Edit elements removed.`);
+        return; // Stop if edit mode was closed before debounce fired
+    }
+
+    console.log(`Attempting auto-save for note index: ${noteIndex}`);
+
+    // Get current values from the inputs within the specific noteElement
+    const newTitle = editTitleInputCheck ? editTitleInputCheck.value.trim() : notes[noteIndex]?.title;
+    const newText = editInputCheck ? editInputCheck.value : notes[noteIndex]?.text;
+    const editTagsInputCheck = noteElement.querySelector('input.edit-tags-input');
+    const newTagString = editTagsInputCheck ? editTagsInputCheck.value : (notes[noteIndex]?.tags || []).join(', ');
+    const newTags = parseTags(newTagString);
+    // Get color from temporary dataset attribute or fallback to current note color
+    const selectedColorValue = noteElement.dataset.selectedColor ?? notes[noteIndex]?.color;
+    // Ensure null is used for default/empty color, not empty string
+    const newColor = selectedColorValue === '' || selectedColorValue === null ? null : selectedColorValue;
+
+    // Prevent saving empty note automatically
+     if (!newTitle && !newText.trim()) {
+         console.log("Auto-save skipped: Title and Text are empty.");
+         return;
+     }
+
+    // Update data and provide feedback
+    const saved = updateNoteData(noteIndex, {
+        title: newTitle,
+        text: newText,
+        tags: newTags,
+        color: newColor
+    });
+
+    if (saved) {
+        noteElement.classList.add('note-autosaved');
+        setTimeout(() => {
+            // Check if class still exists before removing (element might have been re-rendered)
+             noteElement?.classList.remove('note-autosaved');
+        }, 600);
+    }
+
+}, DEBOUNCE_DELAY);
+
+
 const handleNoteEdit = (noteElement, noteId, noteIndex) => {
+    if (isViewingTrash || isViewingArchived) return; // Prevent editing in trash/archive
+
     hideTagSuggestions();
     if (sortableInstance) sortableInstance.option('disabled', true);
     showAddPanelBtn.classList.add('hidden');
 
     const noteData = notes[noteIndex];
 
+    // --- Create Edit Inputs ---
     const editTitleInput = document.createElement('input');
     editTitleInput.type = 'text';
     editTitleInput.classList.add('edit-title-input');
@@ -231,10 +363,13 @@ const handleNoteEdit = (noteElement, noteId, noteIndex) => {
     editTagsInput.value = (noteData.tags || []).join(', ');
     editTagsInput.autocomplete = 'off';
 
+    // --- Create Color Selector ---
     const colorSelectorContainer = document.createElement('div');
     colorSelectorContainer.classList.add('color-selector-container');
     colorSelectorContainer.setAttribute('role', 'radiogroup');
     colorSelectorContainer.setAttribute('aria-label', 'Chọn màu ghi chú');
+    // Temporarily store current/selected color on the main note element
+    noteElement.dataset.selectedColor = noteData.color || '';
 
     NOTE_COLORS.forEach(color => {
         const swatchBtn = document.createElement('button');
@@ -243,43 +378,42 @@ const handleNoteEdit = (noteElement, noteId, noteIndex) => {
         swatchBtn.dataset.colorValue = color.value || '';
         swatchBtn.title = color.name;
         swatchBtn.setAttribute('role', 'radio');
-        swatchBtn.setAttribute('aria-checked', 'false');
+        const isCurrentColor = (noteData.color === color.value) || (!noteData.color && !color.value);
+        swatchBtn.setAttribute('aria-checked', isCurrentColor ? 'true' : 'false');
+        if (isCurrentColor) swatchBtn.classList.add('selected');
 
-        if (color.value) {
-            swatchBtn.style.backgroundColor = color.hex;
-        } else {
+        if (color.value) swatchBtn.style.backgroundColor = color.hex;
+        else {
             swatchBtn.classList.add('default-color-swatch');
             swatchBtn.innerHTML = '&#x2715;';
         }
 
-        if (noteData.color === color.value) {
-            swatchBtn.classList.add('selected');
-            swatchBtn.setAttribute('aria-checked', 'true');
-            noteElement.dataset.selectedColor = color.value || '';
-        }
-
+        // --- Attach Listener for Color Change & AutoSave ---
         swatchBtn.addEventListener('click', () => {
             const selectedValue = swatchBtn.dataset.colorValue;
-            noteElement.dataset.selectedColor = selectedValue;
+            noteElement.dataset.selectedColor = selectedValue; // Update temp storage
+
             colorSelectorContainer.querySelectorAll('.color-swatch-btn').forEach(btn => {
                 const isSelected = btn === swatchBtn;
                 btn.classList.toggle('selected', isSelected);
                 btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
             });
-            NOTE_COLORS.forEach(c => {
-                if (c.value) noteElement.classList.remove(c.value);
-            });
-            if (selectedValue) {
-                noteElement.classList.add(selectedValue);
-            }
+            // Update note visual style immediately
+            NOTE_COLORS.forEach(c => { if (c.value) noteElement.classList.remove(c.value); });
+            if (selectedValue) noteElement.classList.add(selectedValue);
+
+            // Trigger auto-save
+            debouncedAutoSave(noteElement, noteIndex);
         });
         colorSelectorContainer.appendChild(swatchBtn);
     });
 
+    // --- Create Save Button ---
     const saveBtn = document.createElement('button');
     saveBtn.classList.add('save-edit-btn');
     saveBtn.textContent = 'Lưu';
 
+    // --- Hide Original Elements & Insert Edit Elements ---
     const actionsElement = noteElement.querySelector('.note-actions');
     const contentElement = noteElement.querySelector('.note-content');
     const titleElement = noteElement.querySelector('.note-title');
@@ -287,10 +421,7 @@ const handleNoteEdit = (noteElement, noteId, noteIndex) => {
     const timestampElement = noteElement.querySelector('.note-timestamp');
     const bookmarkIcon = noteElement.querySelector('.pinned-bookmark-icon');
 
-    let buttonsToKeepHTML = '';
-    if (!isViewingArchived && actionsElement) {
-        buttonsToKeepHTML = actionsElement.querySelector('.pin-btn')?.outerHTML || '';
-    }
+    let buttonsToKeepHTML = actionsElement?.querySelector('.pin-btn')?.outerHTML || ''; // Keep pin button
 
     if(bookmarkIcon) bookmarkIcon.style.display = 'none';
     if(titleElement) titleElement.style.display = 'none';
@@ -298,127 +429,119 @@ const handleNoteEdit = (noteElement, noteId, noteIndex) => {
     if(tagsElement) tagsElement.style.display = 'none';
     if(timestampElement) timestampElement.style.display = 'none';
 
-    const insertBeforeElement = contentElement || actionsElement;
-    noteElement.insertBefore(editTitleInput, insertBeforeElement);
-    noteElement.insertBefore(editInput, insertBeforeElement);
-    noteElement.insertBefore(editTagsInput, insertBeforeElement);
-    noteElement.insertBefore(colorSelectorContainer, insertBeforeElement);
-
-    if(actionsElement) {
-        actionsElement.innerHTML = buttonsToKeepHTML;
-        actionsElement.appendChild(saveBtn);
+    const insertBeforeElement = contentElement || tagsElement || timestampElement || actionsElement; // Find first available element to insert before
+    if (insertBeforeElement) {
+        noteElement.insertBefore(editTitleInput, insertBeforeElement);
+        noteElement.insertBefore(editInput, insertBeforeElement);
+        noteElement.insertBefore(editTagsInput, insertBeforeElement);
+        noteElement.insertBefore(colorSelectorContainer, insertBeforeElement);
+    } else { // Fallback if note structure is unexpected
+        noteElement.appendChild(editTitleInput);
+        noteElement.appendChild(editInput);
+        noteElement.appendChild(editTagsInput);
+        noteElement.appendChild(colorSelectorContainer);
     }
 
-    editTitleInput.focus();
+
+    if(actionsElement) {
+        actionsElement.innerHTML = buttonsToKeepHTML; // Clear old buttons, keep pin
+        actionsElement.appendChild(saveBtn); // Add save button
+    }
+
+    // --- Attach Input Listeners for AutoSave & Suggestions ---
+    editTitleInput.addEventListener('input', () => debouncedAutoSave(noteElement, noteIndex));
+    editInput.addEventListener('input', () => debouncedAutoSave(noteElement, noteIndex));
+    editTagsInput.addEventListener('input', (event) => {
+        handleTagInput(event); // Update suggestions
+        debouncedAutoSave(noteElement, noteIndex); // Trigger auto-save
+    });
+    // Add blur/keydown for tag suggestions specifically
+    editTagsInput.addEventListener('blur', handleTagInputBlur);
+    editTagsInput.addEventListener('keydown', handleTagInputKeydown);
+
+    editTitleInput.focus(); // Focus title first
 };
 
-// Function remains the same as the last version (only updates lastModified if content changed)
+
 const handleNoteSaveEdit = (noteElement, noteId, noteIndex) => {
+    // No need to cancel debounce here if updateNoteData handles changes correctly
+
     const editTitleInput = noteElement.querySelector('input.edit-title-input');
     const editInput = noteElement.querySelector('textarea.edit-input');
     const editTagsInput = noteElement.querySelector('input.edit-tags-input');
 
-    // Lấy giá trị mới
-    const newTitle = editTitleInput ? editTitleInput.value.trim() : '';
-    const newText = editInput ? editInput.value : '';
-    const newTagString = editTagsInput ? editTagsInput.value : '';
-    const newTags = parseTags(newTagString); // Parse tags mới
-    const selectedColorValue = noteElement.dataset.selectedColor;
-    const newColor = selectedColorValue === '' ? null : selectedColorValue;
+    // Get final values
+    const newTitle = editTitleInput ? editTitleInput.value.trim() : notes[noteIndex]?.title;
+    const newText = editInput ? editInput.value : notes[noteIndex]?.text;
+    const newTagString = editTagsInput ? editTagsInput.value : (notes[noteIndex]?.tags || []).join(', ');
+    const newTags = parseTags(newTagString);
+    const selectedColorValue = noteElement.dataset.selectedColor ?? notes[noteIndex]?.color;
+    const newColor = selectedColorValue === '' || selectedColorValue === null ? null : selectedColorValue;
 
-    // Lấy giá trị cũ để so sánh
-    const oldTitle = notes[noteIndex].title;
-    const oldText = notes[noteIndex].text;
-    const oldTags = notes[noteIndex].tags || [];
-    const oldColor = notes[noteIndex].color;
-
-    // Kiểm tra xem các thuộc tính nào đã thực sự thay đổi
-    const titleChanged = oldTitle !== newTitle;
-    const textChanged = oldText !== newText;
-    const tagsChanged = JSON.stringify(oldTags.sort()) !== JSON.stringify(newTags.sort());
-    const colorChanged = oldColor !== newColor;
-
-    const anyPropertyChanged = titleChanged || textChanged || tagsChanged || colorChanged;
-    const contentChanged = titleChanged || textChanged || tagsChanged;
-
-    if (newTitle || newText.trim()) {
-        notes[noteIndex].title = newTitle;
-        notes[noteIndex].text = newText;
-        notes[noteIndex].tags = newTags;
-        notes[noteIndex].color = newColor;
-
-        if (contentChanged) {
-            notes[noteIndex].lastModified = Date.now();
-        }
-
-        if (anyPropertyChanged) {
-            saveNotes();
-        }
-
-        displayNotes(searchInput.value);
-        showAddPanelBtn.classList.remove('hidden');
-    } else {
-        alert("Tiêu đề hoặc Nội dung không được để trống hoàn toàn!");
-        displayNotes(searchInput.value);
-        showAddPanelBtn.classList.remove('hidden');
+    // Final validation before manual save
+    if (!newTitle && !newText.trim()) {
+        alert("Tiêu đề hoặc Nội dung không được để trống hoàn toàn khi lưu!");
+        return; // Keep edit mode open
     }
 
+    // Update data using the reusable function
+    updateNoteData(noteIndex, {
+        title: newTitle,
+        text: newText,
+        tags: newTags,
+        color: newColor
+    });
+
+    // Clean up temporary data
     delete noteElement.dataset.selectedColor;
+
+    // Close edit mode and refresh display
     hideTagSuggestions();
+    displayNotes(searchInput.value);
+    showAddPanelBtn.classList.remove('hidden');
     if(sortableInstance) sortableInstance.option('disabled', false);
 };
 
+// --- Other Helper Functions (Checklist, Modal, Render, Drag, Tags, AddPanel, Import/Export) ---
+// (Keep the existing versions of these functions from the previous update,
+//  ensuring renderNoteElement correctly disables checklists in trash view, etc.)
 
 const handleChecklistToggle = (noteId, clickedCheckbox) => {
+    if (isViewingTrash) return; // Prevent toggle in trash
+    const noteElementDOM = notesContainer.querySelector(`.note[data-id="${noteId}"]`);
+    if (noteElementDOM && noteElementDOM.querySelector('.edit-input')) {
+        clickedCheckbox.checked = !clickedCheckbox.checked; // Revert visual state
+        return; // Prevent toggle while editing
+    }
+
     const noteIndex = notes.findIndex(note => note.id === noteId);
     if (noteIndex === -1) return;
     const noteData = notes[noteIndex];
     const noteText = noteData.text;
-    const noteElement = notesContainer.querySelector(`.note[data-id="${noteId}"] .note-content`);
-    if (!noteElement && !document.querySelector(`.note[data-id="${noteId}"] textarea.edit-input`)) {
-         console.error("Cannot find note content or edit area to update checklist.");
-         return;
-    }
-     const allCheckboxesInNote = noteElement
-        ? Array.from(noteElement.querySelectorAll('input[type="checkbox"].task-list-item-checkbox'))
-        : [];
+    const noteContentElement = noteElementDOM?.querySelector('.note-content');
+    if (!noteContentElement) return;
+
+    const allCheckboxesInNote = Array.from(noteContentElement.querySelectorAll('input[type="checkbox"].task-list-item-checkbox'));
     const checkboxIndex = allCheckboxesInNote.indexOf(clickedCheckbox);
     if (checkboxIndex === -1) {
-        console.error("Could not determine checkbox index within the rendered list.");
-         clickedCheckbox.checked = !clickedCheckbox.checked;
-        return;
+        clickedCheckbox.checked = !clickedCheckbox.checked; return;
     }
+
     try {
         const taskRegex = /^- \[( |x|X)\]/gm;
-        let currentMatchIndex = 0;
-        let updated = false;
+        let currentMatchIndex = 0; let updated = false;
         const updatedText = noteText.replace(taskRegex, (match, currentState) => {
             if (currentMatchIndex === checkboxIndex) {
                 const newState = (currentState === ' ' ? 'x' : ' ');
-                updated = true;
-                currentMatchIndex++;
-                return `- [${newState}]`;
-            } else {
-                currentMatchIndex++;
-                return match;
-            }
+                updated = true; currentMatchIndex++; return `- [${newState}]`;
+            } else { currentMatchIndex++; return match; }
         });
         if (updated) {
             notes[noteIndex].text = updatedText;
-            notes[noteIndex].lastModified = Date.now(); // Checklist change should update lastModified
-            saveNotes();
-            // We need to redraw to reflect the change, which might re-sort if lastModified is used
-            // Since we removed lastModified sorting from main view, this is okay.
-            displayNotes(searchInput.value);
-        } else {
-            console.error("Failed to find corresponding checklist item in Markdown data at index:", checkboxIndex);
-             clickedCheckbox.checked = !clickedCheckbox.checked;
-        }
-    } catch (error) {
-        console.error("Error updating checklist Markdown:", error);
-        clickedCheckbox.checked = !clickedCheckbox.checked;
-        alert("Đã xảy ra lỗi khi cập nhật checklist.");
-    }
+            notes[noteIndex].lastModified = Date.now(); saveNotes();
+            displayNotes(searchInput.value); // Re-render needed to show text change/strikethrough
+        } else { clickedCheckbox.checked = !clickedCheckbox.checked; }
+    } catch (error) { console.error("Error updating checklist:", error); clickedCheckbox.checked = !clickedCheckbox.checked; alert("Lỗi cập nhật checklist."); }
 };
 
 const showFullNoteModal = (title, noteText) => {
@@ -448,610 +571,89 @@ const showFullNoteModal = (title, noteText) => {
     if (typeof marked === 'function') {
         try {
             modalBody.innerHTML = marked.parse(noteText || '');
-            const modalCheckboxes = modalBody.querySelectorAll('input[type="checkbox"]');
-            modalCheckboxes.forEach(checkbox => {
-                checkbox.disabled = true;
-                 checkbox.style.cursor = 'not-allowed';
-            });
-        } catch (e) {
-            console.error("Lỗi parse markdown cho modal:", e);
-            modalBody.textContent = noteText || '';
-        }
-    } else {
-        modalBody.textContent = noteText || '';
-    }
+            modalBody.querySelectorAll('input[type="checkbox"]').forEach(checkbox => { checkbox.disabled = true; checkbox.style.cursor = 'not-allowed'; });
+        } catch (e) { modalBody.textContent = escapeHTML(noteText || ''); }
+    } else { modalBody.textContent = escapeHTML(noteText || ''); }
     modalContent.appendChild(modalHeader);
     modalContent.appendChild(modalBody);
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
-    requestAnimationFrame(() => {
-        modal.classList.add('visible');
-    });
+    requestAnimationFrame(() => { modal.classList.add('visible'); });
     closeModalBtn.focus();
     const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-    const closeFunc = () => {
-        modal.classList.remove('visible');
-        modal.addEventListener('transitionend', () => {
-             if (modal.parentNode) {
-                 modal.remove();
-             }
-             document.removeEventListener('keydown', handleModalKeyDown);
-        }, { once: true });
-    };
-     const handleModalKeyDown = (event) => {
-        if (event.key === 'Escape') {
-            closeFunc();
-        }
-        if (event.key === 'Tab') {
-             if (event.shiftKey) {
-                 if (document.activeElement === firstElement) {
-                     lastElement.focus();
-                     event.preventDefault();
-                 }
-             } else {
-                 if (document.activeElement === lastElement) {
-                     firstElement.focus();
-                     event.preventDefault();
-                 }
-             }
-         }
-    };
+    const firstElement = focusableElements[0]; const lastElement = focusableElements[focusableElements.length - 1];
+    const closeFunc = () => { modal.classList.remove('visible'); modal.addEventListener('transitionend', () => { if (modal.parentNode) modal.remove(); document.removeEventListener('keydown', handleModalKeyDown); }, { once: true }); };
+    const handleModalKeyDown = (event) => { if (event.key === 'Escape') closeFunc(); if (event.key === 'Tab') { if (event.shiftKey) { if (document.activeElement === firstElement) { lastElement.focus(); event.preventDefault(); } } else { if (document.activeElement === lastElement) { firstElement.focus(); event.preventDefault(); } } } };
     closeModalBtn.addEventListener('click', closeFunc);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            closeFunc();
-        }
-    });
+    modal.addEventListener('click', (event) => { if (event.target === modal) closeFunc(); });
     document.addEventListener('keydown', handleModalKeyDown);
 };
 
-const renderNoteElement = (note) => {
-    const noteElement = document.createElement('div');
-    noteElement.classList.add('note');
-    noteElement.dataset.id = note.id;
-
-    NOTE_COLORS.forEach(color => {
-        if (color.value) noteElement.classList.remove(color.value);
-    });
-    if (note.color) {
-        noteElement.classList.add(note.color);
-    }
-
-    if (note.pinned && !isViewingArchived) {
-        noteElement.classList.add('pinned-note');
-        const bookmarkIcon = document.createElement('span');
-        bookmarkIcon.classList.add('pinned-bookmark-icon');
-        bookmarkIcon.innerHTML = '&#128278;';
-        bookmarkIcon.setAttribute('aria-hidden', 'true');
-        noteElement.appendChild(bookmarkIcon);
-    }
-
-    if (note.title) {
-        const titleElement = document.createElement('h3');
-        titleElement.classList.add('note-title');
-        let titleHTML = note.title;
-        const filter = searchInput.value.toLowerCase().trim();
-        const isTagSearch = filter.startsWith('#');
-        if (!isTagSearch && filter && typeof escapeRegExp === 'function') {
-            try {
-                const highlightRegex = new RegExp(`(${escapeRegExp(filter)})`, 'gi');
-                titleHTML = titleHTML.replace(highlightRegex, '<mark>$1</mark>');
-            } catch(e) { console.error("Regex error in title highlight", e); }
-        }
-        titleElement.innerHTML = titleHTML;
-        noteElement.appendChild(titleElement);
-    }
-
-    const contentElement = document.createElement('div');
-    contentElement.classList.add('note-content');
-
-    let originalParsedContentHTML = '';
-    if (typeof marked === 'function') {
-        try {
-            originalParsedContentHTML = marked.parse(note.text || '');
-        } catch(e) {
-            console.error(`Markdown parsing error for note ${note.id}:`, e);
-            originalParsedContentHTML = escapeHTML(note.text || '');
-        }
-    } else {
-         originalParsedContentHTML = escapeHTML(note.text || '');
-    }
-
-    let displayContentHTML = originalParsedContentHTML;
-    const filterContent = searchInput.value.toLowerCase().trim();
-    const isTagSearchContent = filterContent.startsWith('#');
-    if (!isTagSearchContent && filterContent && typeof escapeRegExp === 'function') {
-        try {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = originalParsedContentHTML;
-            const textNodes = [];
-            const walk = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null, false);
-            let node;
-            while(node = walk.nextNode()) {
-                if (node.parentElement && !['SCRIPT', 'STYLE', 'PRE', 'CODE'].includes(node.parentElement.tagName)) {
-                     textNodes.push(node);
-                }
-            }
-             const highlightRegex = new RegExp(`(${escapeRegExp(filterContent)})`, 'gi');
-             textNodes.forEach(textNode => {
-                const text = textNode.nodeValue;
-                const newNodeValue = text.replace(highlightRegex, '<mark>$1</mark>');
-                if (newNodeValue !== text) {
-                    const span = document.createElement('span');
-                    span.innerHTML = newNodeValue;
-                    textNode.parentNode.replaceChild(span, textNode);
-                 }
-             });
-             displayContentHTML = tempDiv.innerHTML;
-
-        } catch (e) {
-            console.error("Regex error or DOM manipulation error in content highlight", e);
-             try {
-                const highlightRegexSimple = new RegExp(`(${escapeRegExp(filterContent)})`, 'gi');
-                displayContentHTML = displayContentHTML.replace(highlightRegexSimple, '<mark>$1</mark>');
-             } catch (re) {/* Ignore secondary error */}
-        }
-    }
-
-    contentElement.innerHTML = displayContentHTML;
-
-    const checkboxes = contentElement.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.disabled = false;
-        checkbox.classList.add('task-list-item-checkbox');
-        const parentLi = checkbox.closest('li');
-        if (parentLi) {
-            parentLi.classList.add('task-list-item');
-        }
-    });
-
-    noteElement.appendChild(contentElement);
-
-    requestAnimationFrame(() => {
-         // Add slight delay or ensure styles are applied before checking scrollHeight
-         // setTimeout(() => {
-            if (contentElement.scrollHeight > contentElement.clientHeight + 2) {
-                contentElement.classList.add('has-overflow');
-                const readMoreBtn = document.createElement('button');
-                readMoreBtn.textContent = 'Xem thêm';
-                readMoreBtn.classList.add('read-more-btn');
-                readMoreBtn.type = 'button';
-                readMoreBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showFullNoteModal(note.title, note.text);
-                });
-                // Check if button already exists to prevent duplicates during potential re-renders
-                if (!noteElement.querySelector('.read-more-btn')) {
-                    noteElement.appendChild(readMoreBtn);
-                }
-            }
-         // }, 0); // Optional delay
-    });
-
-
-    const tagsElement = document.createElement('div');
-    tagsElement.classList.add('note-tags');
-    if (note.tags && note.tags.length > 0) {
-        note.tags.forEach(tag => {
-            const tagBadge = document.createElement('button');
-            tagBadge.classList.add('tag-badge');
-            tagBadge.textContent = `#${tag}`;
-            tagBadge.dataset.tag = tag;
-            tagBadge.type = 'button';
-            tagsElement.appendChild(tagBadge);
-        });
-    }
-    noteElement.appendChild(tagsElement);
-
-    const timestampElement = document.createElement('small');
-    timestampElement.classList.add('note-timestamp');
-    const creationDate = formatTimestamp(note.id);
-    let timestampText = `Tạo: ${creationDate}`;
-    if (note.lastModified && note.lastModified > note.id + 60000) {
-        const modifiedDate = formatTimestamp(note.lastModified);
-        timestampText += ` (Sửa: ${modifiedDate})`;
-    }
-    timestampElement.textContent = timestampText;
-    noteElement.appendChild(timestampElement);
-
-    const actionsElement = document.createElement('div');
-    actionsElement.classList.add('note-actions');
-
-    if (!isViewingArchived) {
-        const pinBtn = document.createElement('button');
-        pinBtn.classList.add('pin-btn');
-        pinBtn.innerHTML = '&#128204;';
-        pinBtn.title = note.pinned ? "Bỏ ghim" : "Ghim ghi chú";
-        pinBtn.setAttribute('aria-label', note.pinned ? "Bỏ ghim ghi chú" : "Ghim ghi chú");
-        pinBtn.setAttribute('aria-pressed', note.pinned ? 'true' : 'false');
-        if (note.pinned) {
-            pinBtn.classList.add('pinned');
-        }
-        actionsElement.appendChild(pinBtn);
-    }
-
-    const editBtn = document.createElement('button');
-    editBtn.classList.add('edit-btn');
-    editBtn.textContent = 'Sửa';
-    editBtn.title = 'Sửa ghi chú';
-    actionsElement.appendChild(editBtn);
-
-    if (isViewingArchived) {
-        const unarchiveBtn = document.createElement('button');
-        unarchiveBtn.classList.add('unarchive-btn');
-        unarchiveBtn.innerHTML = '&#x1F5C4;&#xFE0F;';
-        unarchiveBtn.title = 'Khôi phục ghi chú';
-        actionsElement.appendChild(unarchiveBtn);
-    } else {
-        const archiveBtn = document.createElement('button');
-        archiveBtn.classList.add('archive-btn');
-        archiveBtn.innerHTML = '&#128451;';
-        archiveBtn.title = 'Lưu trữ ghi chú';
-        actionsElement.appendChild(archiveBtn);
-    }
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.classList.add('delete-btn');
-    deleteBtn.textContent = 'Xóa';
-    deleteBtn.title = 'Xóa ghi chú vĩnh viễn';
-    actionsElement.appendChild(deleteBtn);
-
+const renderNoteElement = (note) => { // Keep the version from previous update (Trash feature)
+    const noteElement = document.createElement('div'); noteElement.classList.add('note'); noteElement.dataset.id = note.id;
+    NOTE_COLORS.forEach(color => { if (color.value) noteElement.classList.remove(color.value); }); if (note.color) noteElement.classList.add(note.color);
+    if (note.pinned && !isViewingArchived && !isViewingTrash) { noteElement.classList.add('pinned-note'); const bookmarkIcon = document.createElement('span'); bookmarkIcon.classList.add('pinned-bookmark-icon'); bookmarkIcon.innerHTML = '&#128278;'; bookmarkIcon.setAttribute('aria-hidden', 'true'); noteElement.appendChild(bookmarkIcon); }
+    if (note.title) { const titleElement = document.createElement('h3'); titleElement.classList.add('note-title'); let titleHTML = escapeHTML(note.title); const filter = searchInput.value.toLowerCase().trim(); const isTagSearch = filter.startsWith('#'); if (!isTagSearch && filter) { try { const highlightRegex = new RegExp(`(${escapeRegExp(filter)})`, 'gi'); titleHTML = titleHTML.replace(highlightRegex, '<mark>$1</mark>'); } catch(e) {} } titleElement.innerHTML = titleHTML; noteElement.appendChild(titleElement); }
+    const contentElement = document.createElement('div'); contentElement.classList.add('note-content'); let originalParsedContentHTML = ''; if (typeof marked === 'function') { try { originalParsedContentHTML = marked.parse(note.text || ''); } catch(e) { originalParsedContentHTML = escapeHTML(note.text || '').replace(/\n/g, '<br>'); } } else { originalParsedContentHTML = escapeHTML(note.text || '').replace(/\n/g, '<br>'); } let displayContentHTML = originalParsedContentHTML; const filterContent = searchInput.value.toLowerCase().trim(); const isTagSearchContent = filterContent.startsWith('#'); if (!isTagSearchContent && filterContent) { try { const tempDiv = document.createElement('div'); tempDiv.innerHTML = originalParsedContentHTML; const textNodes = []; const walk = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null, false); let node; while(node = walk.nextNode()) { if (node.parentElement && !['SCRIPT', 'STYLE', 'PRE', 'CODE', 'MARK', 'A'].includes(node.parentElement.tagName.toUpperCase())) textNodes.push(node); } const highlightRegex = new RegExp(`(${escapeRegExp(filterContent)})`, 'gi'); textNodes.forEach(textNode => { const text = textNode.nodeValue; if(text && text.toLowerCase().includes(filterContent)) { const span = document.createElement('span'); span.innerHTML = text.replace(highlightRegex, '<mark>$1</mark>'); textNode.parentNode.replaceChild(span, textNode); } }); displayContentHTML = tempDiv.innerHTML; } catch (e) { try { if (!originalParsedContentHTML.match(/<[^>]+>/)) { const highlightRegexSimple = new RegExp(`(${escapeRegExp(filterContent)})`, 'gi'); displayContentHTML = originalParsedContentHTML.replace(highlightRegexSimple, '<mark>$1</mark>'); } } catch (re) {} } } contentElement.innerHTML = displayContentHTML;
+    const checkboxes = contentElement.querySelectorAll('input[type="checkbox"]'); checkboxes.forEach(checkbox => { checkbox.disabled = isViewingTrash; checkbox.classList.add('task-list-item-checkbox'); if(isViewingTrash) checkbox.style.cursor = 'not-allowed'; const parentLi = checkbox.closest('li'); if (parentLi) parentLi.classList.add('task-list-item'); }); noteElement.appendChild(contentElement);
+    requestAnimationFrame(() => { if (contentElement.scrollHeight > contentElement.clientHeight + 2) { contentElement.classList.add('has-overflow'); const readMoreBtn = document.createElement('button'); readMoreBtn.textContent = 'Xem thêm'; readMoreBtn.classList.add('read-more-btn'); readMoreBtn.type = 'button'; readMoreBtn.addEventListener('click', (e) => { e.stopPropagation(); showFullNoteModal(note.title, note.text); }); if (!noteElement.querySelector('.read-more-btn')) noteElement.appendChild(readMoreBtn); } else { contentElement.classList.remove('has-overflow'); const existingBtn = noteElement.querySelector('.read-more-btn'); if(existingBtn) existingBtn.remove(); } });
+    const tagsElement = document.createElement('div'); tagsElement.classList.add('note-tags'); if (note.tags && note.tags.length > 0) { note.tags.forEach(tag => { const tagBadge = document.createElement('button'); tagBadge.classList.add('tag-badge'); tagBadge.textContent = `#${tag}`; tagBadge.dataset.tag = tag; tagBadge.type = 'button'; tagsElement.appendChild(tagBadge); }); } noteElement.appendChild(tagsElement);
+    const timestampElement = document.createElement('small'); timestampElement.classList.add('note-timestamp'); const creationDate = formatTimestamp(note.id); let timestampText = `Tạo: ${creationDate}`; if (note.lastModified && note.lastModified > note.id + 60000) { const modifiedDate = formatTimestamp(note.lastModified); timestampText += ` (Sửa: ${modifiedDate})`; } if (isViewingTrash && note.deletedTimestamp) { const deletedDate = formatTimestamp(note.deletedTimestamp); timestampText += ` (Xóa: ${deletedDate})`; } timestampElement.textContent = timestampText; noteElement.appendChild(timestampElement);
+    const actionsElement = document.createElement('div'); actionsElement.classList.add('note-actions');
+    if (isViewingTrash) { const restoreBtn = document.createElement('button'); restoreBtn.classList.add('restore-btn'); restoreBtn.innerHTML = '&#x21A9;&#xFE0F;'; restoreBtn.title = 'Khôi phục ghi chú'; actionsElement.appendChild(restoreBtn); const deletePermanentBtn = document.createElement('button'); deletePermanentBtn.classList.add('delete-permanent-btn'); deletePermanentBtn.textContent = 'Xóa VV'; deletePermanentBtn.title = 'Xóa ghi chú vĩnh viễn'; actionsElement.appendChild(deletePermanentBtn); }
+    else if (isViewingArchived) { const unarchiveBtn = document.createElement('button'); unarchiveBtn.classList.add('unarchive-btn'); unarchiveBtn.innerHTML = '&#x1F5C4;&#xFE0F;'; unarchiveBtn.title = 'Khôi phục từ Lưu trữ'; actionsElement.appendChild(unarchiveBtn); const deleteBtn = document.createElement('button'); deleteBtn.classList.add('delete-btn'); deleteBtn.textContent = 'Xóa'; deleteBtn.title = 'Chuyển vào thùng rác'; actionsElement.appendChild(deleteBtn); }
+     else { const pinBtn = document.createElement('button'); pinBtn.classList.add('pin-btn'); pinBtn.innerHTML = '&#128204;'; pinBtn.title = note.pinned ? "Bỏ ghim" : "Ghim ghi chú"; pinBtn.setAttribute('aria-label', note.pinned ? "Bỏ ghim ghi chú" : "Ghim ghi chú"); pinBtn.setAttribute('aria-pressed', note.pinned ? 'true' : 'false'); if (note.pinned) pinBtn.classList.add('pinned'); actionsElement.appendChild(pinBtn); const editBtn = document.createElement('button'); editBtn.classList.add('edit-btn'); editBtn.textContent = 'Sửa'; editBtn.title = 'Sửa ghi chú'; actionsElement.appendChild(editBtn); const archiveBtn = document.createElement('button'); archiveBtn.classList.add('archive-btn'); archiveBtn.innerHTML = '&#128451;'; archiveBtn.title = 'Lưu trữ ghi chú'; actionsElement.appendChild(archiveBtn); const deleteBtn = document.createElement('button'); deleteBtn.classList.add('delete-btn'); deleteBtn.textContent = 'Xóa'; deleteBtn.title = 'Chuyển vào thùng rác'; actionsElement.appendChild(deleteBtn); }
     noteElement.appendChild(actionsElement);
-
     return noteElement;
 };
 
-const handleDragEnd = (evt) => {
-    // Get the current visual order from the DOM
-    const itemIds = Array.from(notesContainer.children)
-                       .map(el => el.classList.contains('note') ? parseInt(el.dataset.id) : null)
-                       .filter(id => id !== null);
+const handleDragEnd = (evt) => { const itemIds = Array.from(notesContainer.children).map(el => el.classList.contains('note') ? parseInt(el.dataset.id) : null).filter(id => id !== null); const noteMap = new Map(notes.map(note => [note.id, note])); const reorderedVisibleNotes = []; const otherNotes = []; notes.forEach(note => { if (note.archived || note.deleted) otherNotes.push(note); }); itemIds.forEach(id => { const note = noteMap.get(id); if (note && !note.archived && !note.deleted) reorderedVisibleNotes.push(note); }); notes = [...reorderedVisibleNotes, ...otherNotes]; saveNotes(); };
+const initSortable = () => { if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; } if (typeof Sortable === 'function' && notesContainer && notesContainer.children.length > 0 && !notesContainer.querySelector('.empty-state') && !isViewingArchived && !isViewingTrash ) { sortableInstance = new Sortable(notesContainer, { animation: 150, handle: '.note', filter: '.note-content input, .note-content textarea, .note-content button, .note-actions button, .tag-badge, .note-content a, .task-list-item-checkbox, .suggestion-item, .read-more-btn, .color-swatch-btn, .edit-title-input, .edit-input, .edit-tags-input', preventOnFilter: true, ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', dragClass: 'sortable-drag', onEnd: handleDragEnd, delay: 100, delayOnTouchOnly: true }); } else if (typeof Sortable !== 'function' && notes.some(n => !n.archived && !n.deleted) && !isViewingArchived && !isViewingTrash) { console.warn("Sortable.js not loaded."); } };
+const getAllUniqueTags = () => { const allTags = notes.reduce((acc, note) => { if (!note.deleted && note.tags && note.tags.length > 0) acc.push(...note.tags); return acc; }, []); return [...new Set(allTags)].sort(); }; // Suggest tags from non-deleted notes only
+const showTagSuggestions = (inputElement, currentTagFragment, suggestions) => { hideTagSuggestions(); if (suggestions.length === 0) return; activeTagInputElement = inputElement; const suggestionBox = document.createElement('div'); suggestionBox.id = SUGGESTION_BOX_ID; suggestionBox.classList.add('tag-suggestions'); suggestionBox.setAttribute('role', 'listbox'); suggestions.forEach(tag => { const item = document.createElement('div'); item.classList.add('suggestion-item'); item.textContent = tag; item.setAttribute('role', 'option'); item.addEventListener('mousedown', (e) => { e.preventDefault(); const currentValue = inputElement.value; const lastCommaIndex = currentValue.lastIndexOf(','); let baseValue = ''; if (lastCommaIndex !== -1) baseValue = currentValue.substring(0, lastCommaIndex + 1).trimStart() + ' '; inputElement.value = baseValue + tag + ', '; hideTagSuggestions(); inputElement.focus(); inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length); }); suggestionBox.appendChild(item); }); const inputRect = inputElement.getBoundingClientRect(); document.body.appendChild(suggestionBox); suggestionBox.style.position = 'absolute'; suggestionBox.style.top = `${inputRect.bottom + window.scrollY}px`; suggestionBox.style.left = `${inputRect.left + window.scrollX}px`; suggestionBox.style.minWidth = `${inputRect.width}px`; suggestionBox.style.width = 'auto'; setTimeout(() => { document.addEventListener('mousedown', handleClickOutsideSuggestions); }, 0); };
+const handleTagInput = (event) => { const inputElement = event.target; const value = inputElement.value; const cursorPosition = inputElement.selectionStart; const lastCommaIndexBeforeCursor = value.substring(0, cursorPosition).lastIndexOf(','); const currentTagFragment = value.substring(lastCommaIndexBeforeCursor + 1, cursorPosition).trim().toLowerCase(); if (currentTagFragment.length >= 1) { const allTags = getAllUniqueTags(); const precedingTagsString = value.substring(0, lastCommaIndexBeforeCursor + 1); const currentEnteredTags = parseTags(precedingTagsString); const filteredSuggestions = allTags.filter(tag => tag.toLowerCase().startsWith(currentTagFragment) && !currentEnteredTags.includes(tag)); showTagSuggestions(inputElement, currentTagFragment, filteredSuggestions); } else hideTagSuggestions(); };
+const handleTagInputBlur = (event) => { setTimeout(() => { const suggestionBox = document.getElementById(SUGGESTION_BOX_ID); if (event.relatedTarget && suggestionBox && suggestionBox.contains(event.relatedTarget)) return; hideTagSuggestions(); }, 150); };
+const handleTagInputKeydown = (event) => { const suggestionBox = document.getElementById(SUGGESTION_BOX_ID); if (event.key === 'Escape' && suggestionBox) { hideTagSuggestions(); event.stopPropagation(); } };
+const showAddPanel = () => { hideTagSuggestions(); addNotePanel.classList.remove('hidden'); showAddPanelBtn.classList.add('hidden'); newNoteTitle.focus(); };
+const hideAddPanel = () => { hideTagSuggestions(); addNotePanel.classList.add('hidden'); showAddPanelBtn.classList.remove('hidden'); newNoteTitle.value = ''; newNoteText.value = ''; newNoteTags.value = ''; };
+const exportNotes = () => { if (notes.length === 0) { alert("Không có ghi chú nào để xuất."); return; } try { const notesToExport = notes.map(note => ({ id: note.id, title: note.title || '', text: note.text, tags: note.tags || [], pinned: note.pinned || false, lastModified: note.lastModified || note.id, archived: note.archived || false, color: note.color || null, deleted: note.deleted || false, deletedTimestamp: note.deletedTimestamp || null })); const jsonData = JSON.stringify(notesToExport, null, 2); const blob = new Blob([jsonData], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-'); a.download = `start-notes-backup-${timestamp}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); } catch (error) { console.error("Lỗi xuất ghi chú:", error); alert("Lỗi khi xuất ghi chú."); } };
+const importNotes = (file) => { if (!file) { alert("Vui lòng chọn file."); return; } if (!confirm("CẢNH BÁO:\nThao tác này sẽ THAY THẾ TOÀN BỘ ghi chú hiện tại.\nBạn chắc chắn muốn tiếp tục?")) { importFileInput.value = null; return; } const reader = new FileReader(); reader.onload = (event) => { try { const importedData = JSON.parse(event.target.result); if (!Array.isArray(importedData)) throw new Error("Dữ liệu không phải là một danh sách (mảng)."); const validatedNotes = importedData.map((note, index) => { if (typeof note !== 'object' || note === null) return null; return { id: typeof note.id === 'number' ? note.id : Date.now() + index, title: typeof note.title === 'string' ? note.title : '', text: typeof note.text === 'string' ? note.text : '', tags: Array.isArray(note.tags) ? note.tags.map(String).filter(t => t.trim() !== '') : [], pinned: typeof note.pinned === 'boolean' ? note.pinned : false, lastModified: typeof note.lastModified === 'number' ? note.lastModified : (typeof note.id === 'number' ? note.id : Date.now() + index), archived: typeof note.archived === 'boolean' ? note.archived : false, color: typeof note.color === 'string' ? note.color : null, deleted: typeof note.deleted === 'boolean' ? note.deleted : false, deletedTimestamp: typeof note.deletedTimestamp === 'number' ? note.deletedTimestamp : null }; }).filter(Boolean); notes = validatedNotes; saveNotes(); isViewingArchived = false; isViewingTrash = false; displayNotes(); alert(`Đã nhập thành công ${notes.length} ghi chú!`); } catch (error) { console.error("Lỗi nhập file:", error); alert(`Lỗi nhập file: ${error.message}`); } finally { importFileInput.value = null; } }; reader.onerror = (event) => { console.error("Lỗi đọc file:", event.target.error); alert("Lỗi đọc file."); importFileInput.value = null; }; reader.readAsText(file); };
 
-    // Create a map of notes currently in the main `notes` array for quick lookup
-    const noteMap = new Map(notes.map(note => [note.id, note]));
-
-    // Rebuild the `notes` array based on the new visual order, keeping archived notes separate
-    const reorderedNotes = [];
-    const stillArchivedNotes = [];
-
-    itemIds.forEach(id => {
-        const note = noteMap.get(id);
-        if (note && !note.archived) { // Ensure note exists and is not archived
-            reorderedNotes.push(note);
-        }
-    });
-
-    // Find notes that were originally archived and keep them
-    notes.forEach(note => {
-        if (note.archived) {
-            stillArchivedNotes.push(note);
-        }
-    });
-
-    // Combine the reordered visible notes and the archived notes
-    notes = [...reorderedNotes, ...stillArchivedNotes];
-
-    saveNotes();
-    // No need to call displayNotes, the visual order is already correct.
-};
-
-
-const initSortable = () => {
-    if (sortableInstance) {
-        sortableInstance.destroy();
-        sortableInstance = null;
-    }
-    if (typeof Sortable === 'function' &&
-        notesContainer &&
-        notesContainer.children.length > 0 &&
-        !notesContainer.querySelector('.empty-state') &&
-        !isViewingArchived )
-    {
-        sortableInstance = new Sortable(notesContainer, {
-            animation: 150,
-            handle: '.note', // Drag the whole note
-            // Prevent drag start on interactive elements
-            filter: '.note-content input, .note-content textarea, .note-content button, .note-actions button, .tag-badge, .note-content a, .task-list-item-checkbox, .suggestion-item, .read-more-btn, .color-swatch-btn',
-            preventOnFilter: true,
-            ghostClass: 'sortable-ghost',
-            chosenClass: 'sortable-chosen',
-            dragClass: 'sortable-drag',
-            onEnd: handleDragEnd, // Function to save the new order
-            delay: 100, // Slightly shorter delay
-            delayOnTouchOnly: true
-        });
-    } else if (typeof Sortable !== 'function' && notes.some(n => !n.archived) && !isViewingArchived) {
-        console.warn("Sortable.js not loaded. Drag-and-drop disabled.");
-    }
-};
-
-const getAllUniqueTags = () => {
-    const allTags = notes.reduce((acc, note) => {
-        if (note.tags && note.tags.length > 0) {
-            acc.push(...note.tags);
-        }
-        return acc;
-    }, []);
-    return [...new Set(allTags)].sort();
-};
-
-const showTagSuggestions = (inputElement, currentTagFragment, suggestions) => {
-    hideTagSuggestions();
-    if (suggestions.length === 0) {
-        return;
-    }
-    activeTagInputElement = inputElement;
-    const suggestionBox = document.createElement('div');
-    suggestionBox.id = SUGGESTION_BOX_ID;
-    suggestionBox.classList.add('tag-suggestions');
-    suggestionBox.setAttribute('role', 'listbox');
-
-    suggestions.forEach(tag => {
-        const item = document.createElement('div');
-        item.classList.add('suggestion-item');
-        item.textContent = tag;
-        item.setAttribute('role', 'option');
-        item.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            const currentValue = inputElement.value;
-            const lastCommaIndex = currentValue.lastIndexOf(',');
-            let baseValue = '';
-            if (lastCommaIndex !== -1) {
-                baseValue = currentValue.substring(0, lastCommaIndex + 1).trimStart() + ' ';
-            }
-            inputElement.value = baseValue + tag + ', ';
-            hideTagSuggestions();
-            inputElement.focus();
-            inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
-        });
-        suggestionBox.appendChild(item);
-    });
-
-    const inputRect = inputElement.getBoundingClientRect();
-    document.body.appendChild(suggestionBox);
-    let top = inputRect.bottom + window.scrollY;
-    let left = inputRect.left + window.scrollX;
-    suggestionBox.style.position = 'absolute';
-    suggestionBox.style.top = `${top}px`;
-    suggestionBox.style.left = `${left}px`;
-    suggestionBox.style.minWidth = `${inputRect.width}px`;
-    suggestionBox.style.width = 'auto';
-     setTimeout(() => {
-        document.addEventListener('mousedown', handleClickOutsideSuggestions);
-     }, 0);
-};
-
-const handleTagInput = (event) => {
-    const inputElement = event.target;
-    const value = inputElement.value;
-    const lastCommaIndex = value.lastIndexOf(',');
-    const currentTagFragment = value.substring(lastCommaIndex + 1).trim().toLowerCase();
-    if (currentTagFragment.length >= 1) {
-        const allTags = getAllUniqueTags();
-        const currentEnteredTags = parseTags(value.substring(0, lastCommaIndex + 1));
-        const filteredSuggestions = allTags.filter(tag =>
-            tag.toLowerCase().startsWith(currentTagFragment) &&
-            !currentEnteredTags.includes(tag)
-        );
-        showTagSuggestions(inputElement, currentTagFragment, filteredSuggestions);
-    } else {
-        hideTagSuggestions();
-    }
-};
-
-const handleTagInputBlur = (event) => {
-    setTimeout(() => {
-        const suggestionBox = document.getElementById(SUGGESTION_BOX_ID);
-        if (suggestionBox && !suggestionBox.contains(document.activeElement)) {
-            hideTagSuggestions();
-        }
-         else if (!suggestionBox) {
-              hideTagSuggestions();
-         }
-    }, 150);
-};
-
-const handleTagInputKeydown = (event) => {
-    const suggestionBox = document.getElementById(SUGGESTION_BOX_ID);
-    if (event.key === 'Escape' && suggestionBox) {
-        hideTagSuggestions();
-    }
-};
-
-const showAddPanel = () => {
-    hideTagSuggestions();
-    addNotePanel.classList.remove('hidden');
-    showAddPanelBtn.classList.add('hidden');
-    newNoteTitle.focus();
-};
-
-const hideAddPanel = () => {
-    hideTagSuggestions();
-    addNotePanel.classList.add('hidden');
-    showAddPanelBtn.classList.remove('hidden');
-    newNoteTitle.value = '';
-    newNoteText.value = '';
-    newNoteTags.value = '';
-};
-
-const exportNotes = () => {
-    if (notes.length === 0) {
-        alert("Không có ghi chú nào để xuất.");
-        return;
-    }
-    try {
-         const notesToExport = notes.map(note => ({
-            id: note.id,
-            title: note.title || '',
-            text: note.text,
-            tags: note.tags || [],
-            pinned: note.pinned || false,
-            lastModified: note.lastModified || note.id,
-            archived: note.archived || false,
-            color: note.color || null
-        }));
-        const jsonData = JSON.stringify(notesToExport, null, 2);
-        const blob = new Blob([jsonData], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        a.download = `start-notes-backup-${timestamp}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        console.log("Xuất ghi chú thành công.");
-    } catch (error) {
-        console.error("Lỗi khi xuất ghi chú:", error);
-        alert("Đã xảy ra lỗi khi cố gắng xuất ghi chú.");
-    }
-};
-
-const importNotes = (file) => {
-    if (!file) {
-        alert("Vui lòng chọn một file để nhập.");
-        return;
-    }
-    if (!confirm("CẢNH BÁO:\n\nThao tác này sẽ THAY THẾ TOÀN BỘ ghi chú hiện tại bằng nội dung từ file đã chọn.\n\nBạn có chắc chắn muốn tiếp tục?")) {
-        return;
-    }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        try {
-            const importedData = JSON.parse(event.target.result);
-            if (!Array.isArray(importedData)) {
-                throw new Error("Dữ liệu nhập vào không phải là một danh sách (mảng) hợp lệ.");
-            }
-            const validatedNotes = importedData.map((note, index) => {
-                 if (typeof note !== 'object' || note === null) {
-                     console.warn(`Mục ${index} trong file không phải object, bỏ qua.`);
-                     return null;
-                 }
-                // Ensure correct types and defaults on import
-                return {
-                    id: typeof note.id === 'number' ? note.id : Date.now() + index,
-                    title: typeof note.title === 'string' ? note.title : '',
-                    text: typeof note.text === 'string' ? note.text : '',
-                    tags: Array.isArray(note.tags) ? note.tags.map(String).filter(t => t.trim() !== '') : [],
-                    pinned: typeof note.pinned === 'boolean' ? note.pinned : false,
-                    lastModified: typeof note.lastModified === 'number' ? note.lastModified : (typeof note.id === 'number' ? note.id : Date.now() + index),
-                    archived: typeof note.archived === 'boolean' ? note.archived : false,
-                    color: typeof note.color === 'string' ? note.color : null
-                };
-            }).filter(Boolean); // Remove nulls from invalid entries
-            notes = validatedNotes;
-            saveNotes();
-            isViewingArchived = false;
-            displayNotes();
-            alert(`Đã nhập thành công ${notes.length} ghi chú!`);
-        } catch (error) {
-            console.error("Lỗi khi phân tích hoặc xử lý file nhập:", error);
-            alert(`Lỗi nhập file: ${error.message}\nVui lòng kiểm tra lại file JSON.`);
-        } finally {
-            importFileInput.value = null;
-        }
-    };
-    reader.onerror = (event) => {
-        console.error("Lỗi đọc file:", event.target.error);
-        alert("Đã xảy ra lỗi khi đọc file.");
-        importFileInput.value = null;
-    };
-    reader.readAsText(file);
-};
 
 // =====================================================================
-//  Core Display Function (Depends on functions defined above)
+//  Core Display Function
 // =====================================================================
-// *** MODIFIED FUNCTION ***
 const displayNotes = (filter = '') => {
     hideTagSuggestions();
     notesContainer.innerHTML = '';
     const lowerCaseFilter = filter.toLowerCase().trim();
 
-    // 1. Filter notes by archive status and search term
     let notesToDisplay = notes.filter(note => {
-        // Filter by archive status first
-        if (note.archived !== isViewingArchived) {
-            return false;
-        }
-        // Then filter by search term if provided
-        if (filter) {
-            const noteTitleLower = (note.title || '').toLowerCase();
-            const noteTextLower = (note.text || '').toLowerCase();
-            const isTagSearch = lowerCaseFilter.startsWith('#');
-            const tagSearchTerm = isTagSearch ? lowerCaseFilter.substring(1) : null;
-
-            if (isTagSearch) {
-                 if (!tagSearchTerm) return true; // Show all if only '#' is entered
-                return note.tags && note.tags.some(tag => tag.toLowerCase() === tagSearchTerm);
-            } else {
-                 const titleMatch = noteTitleLower.includes(lowerCaseFilter);
-                 const textMatch = noteTextLower.includes(lowerCaseFilter);
-                 const tagMatch = note.tags && note.tags.some(tag => tag.toLowerCase().includes(lowerCaseFilter));
-                 return titleMatch || textMatch || tagMatch;
-             }
-        }
-        // If no filter, include all notes matching archive status
+        if (isViewingTrash) { if (!note.deleted) return false; }
+        else if (isViewingArchived) { if (note.deleted || !note.archived) return false; }
+        else { if (note.deleted || note.archived) return false; }
+        if (filter) { const noteTitleLower = (note.title || '').toLowerCase(); const noteTextLower = (note.text || '').toLowerCase(); const isTagSearch = lowerCaseFilter.startsWith('#'); const tagSearchTerm = isTagSearch ? lowerCaseFilter.substring(1) : null; if (isTagSearch) { if (!tagSearchTerm) return true; return note.tags && note.tags.some(tag => tag.toLowerCase() === tagSearchTerm); } else { const titleMatch = noteTitleLower.includes(lowerCaseFilter); const textMatch = noteTextLower.includes(lowerCaseFilter); const tagMatch = note.tags && note.tags.some(tag => tag.toLowerCase().includes(lowerCaseFilter)); return titleMatch || textMatch || tagMatch; } }
         return true;
     });
 
-    // 2. Sort notes based on view
-    if (!isViewingArchived) {
-        // --- MODIFIED SORTING for Main View ---
-        // Only sort to bring pinned notes to the top.
-        // Preserve the relative order determined by drag-and-drop or addition order otherwise.
-        notesToDisplay.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
-        // --- END MODIFIED SORTING ---
-    } else {
-         // Keep sorting archived notes by last modified date (newest first)
-         notesToDisplay.sort((a, b) => (b.lastModified || b.id) - (a.lastModified || a.id));
-    }
+    if (isViewingTrash) notesToDisplay.sort((a, b) => (b.deletedTimestamp || b.lastModified) - (a.deletedTimestamp || a.lastModified));
+    else if (isViewingArchived) notesToDisplay.sort((a, b) => (b.lastModified || b.id) - (a.lastModified || a.id));
+    else notesToDisplay.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
 
-    // Update Archive Status Indicator & Button Text
-    if (isViewingArchived) {
-        archiveStatusIndicator.classList.remove('hidden');
-        viewArchiveBtn.textContent = 'Xem Ghi chú Chính';
-        viewArchiveBtn.classList.add('viewing-archive');
-    } else {
-        archiveStatusIndicator.classList.add('hidden');
-        viewArchiveBtn.textContent = 'Xem Lưu trữ';
-        viewArchiveBtn.classList.remove('viewing-archive');
-    }
+    archiveStatusIndicator.classList.add('hidden'); trashStatusIndicator.classList.add('hidden');
+    viewArchiveBtn.classList.remove('viewing-archive'); viewTrashBtn.classList.remove('viewing-trash');
+    emptyTrashBtn.classList.add('hidden');
+    if (isViewingTrash) { trashStatusIndicator.classList.remove('hidden'); viewTrashBtn.textContent = 'Xem Ghi chú Chính'; viewTrashBtn.classList.add('viewing-trash'); viewArchiveBtn.textContent = 'Xem Lưu trữ'; if(notesToDisplay.length > 0) emptyTrashBtn.classList.remove('hidden'); }
+    else if (isViewingArchived) { archiveStatusIndicator.classList.remove('hidden'); viewArchiveBtn.textContent = 'Xem Ghi chú Chính'; viewArchiveBtn.classList.add('viewing-archive'); viewTrashBtn.textContent = 'Xem Thùng rác'; }
+    else { viewArchiveBtn.textContent = 'Xem Lưu trữ'; viewTrashBtn.textContent = 'Xem Thùng rác'; }
 
-    // Display Empty State Message or Notes
-    if (notesToDisplay.length === 0) {
-        let emptyMessage = '';
-        if (isViewingArchived) {
-            emptyMessage = filter ? 'Không tìm thấy ghi chú lưu trữ phù hợp...' : 'Chưa có ghi chú nào được lưu trữ.';
-        } else {
-            emptyMessage = filter ? 'Không tìm thấy ghi chú phù hợp...' : 'Chưa có ghi chú nào. Dùng nút + để thêm!';
-        }
-        notesContainer.innerHTML = `<p class="empty-state">${emptyMessage}</p>`;
-        if (sortableInstance) {
-            sortableInstance.destroy();
-            sortableInstance = null;
-        }
-        return;
-    }
+    if (notesToDisplay.length === 0) { let emptyMessage = ''; if (isViewingTrash) emptyMessage = filter ? 'Không tìm thấy ghi chú rác khớp...' : 'Thùng rác trống.'; else if (isViewingArchived) emptyMessage = filter ? 'Không tìm thấy ghi chú lưu trữ khớp...' : 'Lưu trữ trống.'; else emptyMessage = filter ? 'Không tìm thấy ghi chú khớp...' : 'Chưa có ghi chú nào.'; notesContainer.innerHTML = `<p class="empty-state">${emptyMessage}</p>`; if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; } return; }
 
-    // Render and Append Note Elements
-    notesToDisplay.forEach(note => {
-        const noteElement = renderNoteElement(note);
-        notesContainer.appendChild(noteElement);
-    });
+    notesToDisplay.forEach(note => { const noteElement = renderNoteElement(note); notesContainer.appendChild(noteElement); });
 
-    // Initialize SortableJS (only for main view)
-    if (!isViewingArchived) {
-        initSortable(); // Ensures Sortable is active/updated for the main view
-    } else if (sortableInstance) {
-        sortableInstance.destroy(); // Destroy if switching to archive view
-        sortableInstance = null;
-    }
+    if (!isViewingArchived && !isViewingTrash) initSortable();
+    else if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
 };
-// *** END MODIFIED FUNCTION ***
 
 
 // =====================================================================
@@ -1062,177 +664,45 @@ const setupEventListeners = () => {
     addNoteBtn.addEventListener('click', addNote);
     showAddPanelBtn.addEventListener('click', showAddPanel);
     closeAddPanelBtn.addEventListener('click', hideAddPanel);
-
-    newNoteTitle.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            addNoteBtn.click();
-        }
-    });
-
-    const debouncedDisplayNotes = debounce((filterValue) => {
-        displayNotes(filterValue);
-    }, 300);
-    searchInput.addEventListener('input', (event) => {
-        debouncedDisplayNotes(event.target.value);
-    });
-
+    newNoteTitle.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addNoteBtn.click(); } });
+    const debouncedDisplayNotes = debounce((filterVal) => displayNotes(filterVal), 300);
+    searchInput.addEventListener('input', (e) => debouncedDisplayNotes(e.target.value));
     exportNotesBtn.addEventListener('click', exportNotes);
-    importNotesBtn.addEventListener('click', () => {
-        importFileInput.click();
-    });
-    importFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if(file) {
-            importNotes(file);
-        }
-    });
+    importNotesBtn.addEventListener('click', () => importFileInput.click());
+    importFileInput.addEventListener('change', (e) => { if(e.target.files[0]) importNotes(e.target.files[0]); });
 
-    viewArchiveBtn.addEventListener('click', () => {
-        isViewingArchived = !isViewingArchived;
-        searchInput.value = '';
-        displayNotes();
-    });
+    viewArchiveBtn.addEventListener('click', () => { if (isViewingArchived) isViewingArchived = false; else { isViewingArchived = true; isViewingTrash = false; } searchInput.value = ''; displayNotes(); });
+    viewTrashBtn.addEventListener('click', () => { if (isViewingTrash) isViewingTrash = false; else { isViewingTrash = true; isViewingArchived = false; } searchInput.value = ''; displayNotes(); });
+    emptyTrashBtn.addEventListener('click', handleEmptyTrash);
 
-    newNoteTags.addEventListener('input', handleTagInput);
-    newNoteTags.addEventListener('blur', handleTagInputBlur);
-    newNoteTags.addEventListener('keydown', handleTagInputKeydown);
-
-    notesContainer.addEventListener('input', (event) => {
-        if (event.target.matches('.edit-tags-input')) {
-            handleTagInput(event);
-        }
-    });
-    notesContainer.addEventListener('blur', (event) => {
-        if (event.target.matches('.edit-tags-input')) {
-            handleTagInputBlur(event);
-        }
-    }, true);
-    notesContainer.addEventListener('keydown', (event) => {
-        if (event.target.matches('.edit-tags-input')) {
-            handleTagInputKeydown(event);
-        }
-    });
+    newNoteTags.addEventListener('input', handleTagInput); newNoteTags.addEventListener('blur', handleTagInputBlur); newNoteTags.addEventListener('keydown', handleTagInputKeydown);
+    notesContainer.addEventListener('input', (e) => { if (e.target.matches('.edit-tags-input')) handleTagInput(e); });
+    notesContainer.addEventListener('blur', (e) => { if (e.target.matches('.edit-tags-input')) handleTagInputBlur(e); }, true);
+    notesContainer.addEventListener('keydown', (e) => { if (e.target.matches('.edit-tags-input')) handleTagInputKeydown(e); });
 
     notesContainer.addEventListener('click', (event) => {
-        const target = event.target;
-        const noteElement = target.closest('.note');
-
-        // Prevent most actions if editing, except for specific buttons
-        if (noteElement && noteElement.querySelector('.edit-input') && !target.closest('.save-edit-btn') && !target.closest('.pin-btn') && !target.closest('.color-swatch-btn')) {
-            return;
-        }
-
-        if (target.matches('.task-list-item-checkbox')) {
-            if (noteElement) {
-                const noteId = parseInt(noteElement.dataset.id);
-                if (!noteElement.querySelector('.edit-input')) {
-                     handleChecklistToggle(noteId, target);
-                } else {
-                    console.warn("Checklist cannot be toggled while editing the note text.");
-                    target.checked = !target.checked;
-                }
-            }
-            return;
-        }
-
-        const tagButton = target.closest('.tag-badge');
-        if (tagButton && tagButton.dataset.tag) {
-             event.preventDefault();
-             searchInput.value = `#${tagButton.dataset.tag}`;
-             searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-             searchInput.focus();
-            return;
-        }
-
-        if (!noteElement) return;
-
-        const noteId = parseInt(noteElement.dataset.id);
-        const noteIndex = notes.findIndex(note => note.id === noteId);
-        if (noteIndex === -1) return;
-
-        if (target.closest('.pin-btn') && !isViewingArchived) {
-            handleNotePin(noteId, noteIndex);
-        }
-        else if (target.closest('.delete-btn')) {
-            handleNoteDelete(noteId, noteIndex);
-        }
-        else if (target.closest('.archive-btn') && !isViewingArchived) {
-            handleNoteArchive(noteId, noteIndex);
-        }
-        else if (target.closest('.unarchive-btn') && isViewingArchived) {
-            handleNoteUnarchive(noteId, noteIndex);
-        }
-        else if (target.closest('.edit-btn')) {
-             const currentlyEditing = notesContainer.querySelector('.edit-input');
-             if (currentlyEditing && currentlyEditing.closest('.note') !== noteElement) {
-                 alert("Vui lòng lưu hoặc hủy thay đổi ở ghi chú đang sửa trước.");
-                 return;
-             }
-            handleNoteEdit(noteElement, noteId, noteIndex);
-        }
-        else if (target.closest('.save-edit-btn')) {
-            handleNoteSaveEdit(noteElement, noteId, noteIndex);
-        }
+        const target = event.target; const noteElement = target.closest('.note');
+        if (noteElement && noteElement.querySelector('.edit-input') && !target.closest('.save-edit-btn') && !target.closest('.pin-btn') && !target.closest('.color-swatch-btn')) return;
+        if (target.matches('.task-list-item-checkbox')) { if (noteElement) handleChecklistToggle(parseInt(noteElement.dataset.id), target); return; }
+        const tagButton = target.closest('.tag-badge'); if (tagButton?.dataset.tag) { event.preventDefault(); searchInput.value = `#${tagButton.dataset.tag}`; searchInput.dispatchEvent(new Event('input', { bubbles: true })); searchInput.focus(); return; }
+        if (!noteElement) return; const noteId = parseInt(noteElement.dataset.id); const noteIndex = notes.findIndex(note => note.id === noteId); if (noteIndex === -1) return;
+        if (target.closest('.pin-btn') && !isViewingArchived && !isViewingTrash) handleNotePin(noteId, noteIndex);
+        else if (target.closest('.delete-btn') && !isViewingTrash) handleNoteDelete(noteId, noteIndex);
+        else if (target.closest('.archive-btn') && !isViewingTrash && !isViewingArchived) handleNoteArchive(noteId, noteIndex);
+        else if (target.closest('.unarchive-btn') && isViewingArchived) handleNoteUnarchive(noteId, noteIndex);
+        else if (target.closest('.edit-btn') && !isViewingArchived && !isViewingTrash) { const currentlyEditing = notesContainer.querySelector('.edit-input'); if (currentlyEditing && currentlyEditing.closest('.note') !== noteElement) { alert("Vui lòng lưu hoặc hủy thay đổi ở ghi chú đang sửa trước."); return; } handleNoteEdit(noteElement, noteId, noteIndex); }
+        else if (target.closest('.save-edit-btn')) handleNoteSaveEdit(noteElement, noteId, noteIndex);
+        else if (target.closest('.restore-btn') && isViewingTrash) handleNoteRestore(noteId, noteIndex);
+        else if (target.closest('.delete-permanent-btn') && isViewingTrash) handleNoteDeletePermanent(noteId, noteIndex);
     });
 
     document.addEventListener('keydown', (event) => {
-        const activeElement = document.activeElement;
-        const isTyping = ['INPUT', 'TEXTAREA'].includes(activeElement.tagName) || activeElement.isContentEditable;
-        const isModalOpen = !!document.querySelector('.note-modal.visible');
-        const isSuggestionBoxOpen = !!document.getElementById(SUGGESTION_BOX_ID);
-
-        if (event.key === 'Escape') {
-            if (isModalOpen) {
-                const modal = document.querySelector('.note-modal.visible');
-                if(modal) {
-                    const closeBtn = modal.querySelector('.close-modal-btn');
-                    if (closeBtn) closeBtn.click();
-                }
-            } else if (isSuggestionBoxOpen) {
-                hideTagSuggestions();
-            } else if (!addNotePanel.classList.contains('hidden')) {
-                hideAddPanel();
-            } else {
-                 const editingNote = notesContainer.querySelector('.edit-input');
-                 if (editingNote) {
-                     if (confirm("Hủy bỏ các thay đổi và đóng chỉnh sửa?")) {
-                         displayNotes(searchInput.value);
-                         showAddPanelBtn.classList.remove('hidden');
-                     }
-                 }
-             }
-            return;
-        }
-
-        if (isModalOpen) return;
-
-        const isEditingNote = activeElement.matches('.edit-input, .edit-title-input, .edit-tags-input');
-        if (isTyping && !isEditingNote && !((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f')) {
-             return;
-         }
-
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'n') {
-            event.preventDefault();
-            if (addNotePanel.classList.contains('hidden') && !notesContainer.querySelector('.edit-input')) {
-                showAddPanel();
-            }
-        }
-        else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
-            const activeNoteElement = activeElement.closest('.note');
-             if (activeNoteElement) {
-                 const activeSaveBtn = activeNoteElement.querySelector('.save-edit-btn');
-                 if (activeSaveBtn) {
-                     event.preventDefault();
-                     activeSaveBtn.click();
-                 }
-             }
-        }
-        else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') {
-            event.preventDefault();
-            searchInput.focus();
-            searchInput.select();
-        }
+        const activeElement = document.activeElement; const isTyping = ['INPUT', 'TEXTAREA'].includes(activeElement.tagName) || activeElement.isContentEditable; const isModalOpen = !!document.querySelector('.note-modal.visible'); const isSuggestionBoxOpen = !!document.getElementById(SUGGESTION_BOX_ID);
+        if (event.key === 'Escape') { if (isModalOpen) document.querySelector('.note-modal.visible .close-modal-btn')?.click(); else if (isSuggestionBoxOpen) hideTagSuggestions(); else if (!addNotePanel.classList.contains('hidden')) hideAddPanel(); else { const editingNoteElement = notesContainer.querySelector('.note .edit-input')?.closest('.note'); if (editingNoteElement) { if (confirm("Hủy bỏ các thay đổi và đóng chỉnh sửa?")) { displayNotes(searchInput.value); showAddPanelBtn.classList.remove('hidden'); if(sortableInstance) sortableInstance.option('disabled', false); } } } return; }
+        if (isModalOpen) return; const isEditingNote = activeElement.matches('.edit-input, .edit-title-input, .edit-tags-input'); if (isTyping && !isEditingNote && !((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f')) return;
+        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'n') { event.preventDefault(); if (addNotePanel.classList.contains('hidden') && !notesContainer.querySelector('.edit-input')) showAddPanel(); }
+        else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { const activeNoteElement = activeElement.closest('.note'); if (activeNoteElement && activeNoteElement.querySelector('.edit-input')) { const noteId = parseInt(activeNoteElement.dataset.id); const noteIndex = notes.findIndex(n => n.id === noteId); if (noteIndex !== -1) { event.preventDefault(); handleNoteSaveEdit(activeNoteElement, noteId, noteIndex); } } }
+        else if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'f') { event.preventDefault(); searchInput.focus(); searchInput.select(); }
     });
 }
 
@@ -1242,7 +712,7 @@ const setupEventListeners = () => {
 const loadNotesAndInit = () => {
      loadNotes();
      applyTheme(localStorage.getItem(THEME_STORAGE_KEY) || 'light');
-     isViewingArchived = false;
+     isViewingArchived = false; isViewingTrash = false;
      displayNotes();
      setupEventListeners();
 };
