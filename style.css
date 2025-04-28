@@ -640,3 +640,132 @@ body.dark-mode .modal-header h2 { color: #9ecbff; }
     color: var(--text-color);
     text-decoration: none;
 }
+/* --- Trash Feature Styles --- */
+#view-trash-btn {
+    /* Keep default secondary color or choose another */
+    background-color: var(--secondary-color);
+}
+
+body.dark-mode #view-trash-btn {
+     background-color: var(--secondary-color);
+}
+
+#view-trash-btn.viewing-trash {
+    background-color: var(--danger-color); /* Highlight red when active */
+    color: var(--primary-text-color);
+}
+body.dark-mode #view-trash-btn.viewing-trash {
+    background-color: var(--danger-color);
+}
+
+
+#empty-trash-btn {
+    background-color: var(--danger-color);
+    color: var(--primary-text-color);
+}
+#empty-trash-btn:hover {
+    opacity: 0.9;
+}
+/* Ensure hidden trash button is truly hidden */
+#empty-trash-btn.hidden {
+    display: none !important; /* Use important if needed */
+}
+
+
+/* Styles for buttons inside notes in trash view */
+.note-actions .restore-btn {
+    color: var(--success-color);
+    font-size: 1.2em; /* Make icon slightly larger */
+    padding: 5px;
+    line-height: 1;
+}
+.note-actions .restore-btn:hover {
+    opacity: 0.7;
+}
+
+.note-actions .delete-permanent-btn {
+    color: var(--danger-color);
+    font-weight: bold; /* Make text bold */
+}
+.note-actions .delete-permanent-btn:hover {
+    opacity: 0.7;
+}
+
+
+/* Ensure correct button colors in Dark Mode */
+body.dark-mode .note-actions .restore-btn {
+    color: var(--success-color); /* Success color usually works ok in dark mode */
+}
+body.dark-mode .note-actions .delete-permanent-btn {
+    color: var(--danger-color); /* Danger color usually works ok in dark mode */
+}
+
+/* Ensure archive/unarchive icons have consistent color source */
+.note-actions .archive-btn {
+    color: var(--secondary-color);
+}
+.note-actions .unarchive-btn {
+    color: var(--success-color); /* Match restore button color */
+    font-size: 1.2em; /* Match restore icon size */
+    padding: 5px;
+    line-height: 1;
+}
+.note-actions .unarchive-btn:hover {
+     opacity: 0.7;
+}
+body.dark-mode .note-actions .archive-btn {
+     color: var(--secondary-color);
+}
+body.dark-mode .note-actions .unarchive-btn {
+     color: var(--success-color);
+}
+
+
+/* Ensure edit button color is correct */
+.note-actions .edit-btn { color: var(--primary-color); }
+body.dark-mode .note-actions .edit-btn { color: #58a6ff; } /* Existing dark mode color */
+
+
+/* Update .delete-btn style to be consistent */
+.note-actions .delete-btn {
+    color: var(--danger-color); /* Change to danger color for consistency */
+}
+body.dark-mode .note-actions .delete-btn {
+    color: var(--danger-color); /* Ensure dark mode also uses danger */
+}
+
+/* Optional: Slightly dim notes in trash (uncomment if desired) */
+/*
+#notes-container .note:has(.delete-permanent-btn) {
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+}
+#notes-container .note:has(.delete-permanent-btn):hover {
+    opacity: 1;
+}
+*/
+
+/* --- Auto-save Visual Feedback --- */
+.note.note-autosaved {
+    transition: box-shadow 0.2s ease-in-out;
+    box-shadow: 0 0 0 2px var(--success-color); /* Green outline feedback */
+}
+/* Ensure dark mode also shows feedback */
+body.dark-mode .note.note-autosaved {
+     box-shadow: 0 0 0 2px var(--success-color);
+}
+
+/* Ensure edit inputs are visually distinct */
+.note input[type="text"].edit-title-input,
+.note textarea.edit-input,
+.note input[type="text"].edit-tags-input {
+    background-color: var(--input-bg-color); /* Already defined, ensure it's applied */
+    border: 1px solid var(--input-border-color); /* Already defined */
+}
+
+/* Slightly adjust spacing for color selector */
+.color-selector-container {
+    margin-top: 8px; /* Add a bit more space above */
+    margin-bottom: 12px; /* Add a bit more space below */
+}
+
