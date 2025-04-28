@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Notes</title>
+    <title>Start Notes - Pinned Notes & Checklists</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" integrity="sha512-Eezs+g9Lq4TCCq0wae01s9PuNWzHYoCMkQAiSOR9XHQLqcq8CMdqDRAWVor9zSUohUQWHcYDEJdUJzqjyMBYOSg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* --- Biến màu --- */
         :root {
             --bg-color: #f4f7f6; --text-color: #333; --card-bg-color: #ffffff; --border-color: #e0e0e0; --primary-color: #007bff; --primary-text-color: #ffffff; --secondary-color: #6c757d; --danger-color: #dc3545; --input-bg-color: #ffffff; --input-border-color: #ced4da; --shadow-color: rgba(0, 0, 0, 0.1); --fab-bg-color: var(--primary-color); --fab-text-color: var(--primary-text-color); --tag-bg-color: #e9ecef; --tag-text-color: #495057;
+            --pin-color: var(--secondary-color);
+            --pinned-color: var(--primary-color);
         }
         body.dark-mode {
              --bg-color: #212529; --text-color: #dee2e6; --card-bg-color: #343a40; --border-color: #495057; --primary-color: #0d6efd; --secondary-color: #adb5bd; --danger-color: #f84d5e; --input-bg-color: #495057; --input-border-color: #6c757d; --shadow-color: rgba(255, 255, 255, 0.1); --tag-bg-color: #495057; --tag-text-color: #dee2e6;
+             --pin-color: var(--secondary-color);
+             --pinned-color: #58a6ff;
         }
         /* --- CSS Cơ bản --- */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s, color 0.3s; line-height: 1.6; }
@@ -27,20 +31,12 @@
         #add-note-panel { padding: 20px; margin-bottom: 20px; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 3px 8px var(--shadow-color); }
         .hidden { display: none !important; }
         #add-note-panel textarea,
-        #add-note-panel input[type="text"] /* Thêm style cho input tag */
+        #add-note-panel input[type="text"]
          {
-            display: block; /* Đảm bảo input chiếm một hàng */
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid var(--input-border-color);
-            border-radius: 5px;
-            background-color: var(--input-bg-color);
-            color: var(--text-color);
-            font-size: 1em;
+            display: block; width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em;
          }
         #add-note-panel textarea { min-height: 80px; resize: vertical; }
-        #add-note-panel .panel-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; /* Thêm khoảng cách trên */}
+        #add-note-panel .panel-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         #add-note-panel #add-note-btn { padding: 10px 20px; background-color: var(--primary-color); color: var(--primary-text-color); border: none; border-radius: 5px; cursor: pointer; font-size: 1em; transition: background-color 0.2s; }
         #add-note-panel #add-note-btn:hover { opacity: 0.9; }
         #add-note-panel #close-add-panel-btn { padding: 8px 15px; background-color: var(--secondary-color); color: var(--primary-text-color); border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
@@ -50,48 +46,66 @@
         .note { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px var(--shadow-color); display: flex; flex-direction: column; justify-content: space-between; transition: box-shadow 0.2s, background-color 0.3s, border-color 0.3s; cursor: grab; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
         .note:active { cursor: grabbing; }
         .note:hover { box-shadow: 0 4px 10px var(--shadow-color); }
+        .note.pinned-note { /* Optional styling */ }
         .note-content { flex-grow: 1; margin-bottom: 10px; word-wrap: break-word; font-size: 1em; }
-        .note-content h1, .note-content h2, .note-content h3 { margin-top: 0.5em; margin-bottom: 0.3em; line-height: 1.3; } .note-content p { margin-top: 0; margin-bottom: 0.5em; } .note-content ul, .note-content ol { margin-top: 0; margin-bottom: 0.5em; padding-left: 20px; } .note-content li { margin-bottom: 0.2em; } .note-content code { background-color: rgba(100, 100, 100, 0.1); padding: 0.1em 0.3em; border-radius: 3px; font-family: monospace; } .note-content pre { background-color: rgba(100, 100, 100, 0.1); padding: 0.5em; border-radius: 3px; overflow-x: auto; } .note-content pre code { background-color: transparent; padding: 0; } .note-content blockquote { border-left: 3px solid var(--secondary-color); margin-left: 0; padding-left: 1em; color: var(--secondary-color); } .note-content a { color: var(--primary-color); text-decoration: none; } .note-content a:hover { text-decoration: underline; }
+        /* Styles for Markdown content */
+        .note-content h1, .note-content h2, .note-content h3 { margin-top: 0.5em; margin-bottom: 0.3em; line-height: 1.3; }
+        .note-content p { margin-top: 0; margin-bottom: 0.5em; }
+        .note-content ul, .note-content ol { margin-top: 0; margin-bottom: 0.5em; padding-left: 20px; }
+        .note-content li { margin-bottom: 0.2em; }
+        .note-content code { background-color: rgba(100, 100, 100, 0.1); padding: 0.1em 0.3em; border-radius: 3px; font-family: monospace; }
+        .note-content pre { background-color: rgba(100, 100, 100, 0.1); padding: 0.5em; border-radius: 3px; overflow-x: auto; }
+        .note-content pre code { background-color: transparent; padding: 0; }
+        .note-content blockquote { border-left: 3px solid var(--secondary-color); margin-left: 0; padding-left: 1em; color: var(--secondary-color); }
+        .note-content a { color: var(--primary-color); text-decoration: none; }
+        .note-content a:hover { text-decoration: underline; }
+
+        /* *** NEW: Checklist Styling *** */
+        .note-content ul li.task-list-item {
+            list-style-type: none; /* Remove default bullet */
+            margin-left: -1.2em; /* Adjust indentation */
+        }
+        .note-content ul li.task-list-item input[type="checkbox"].task-list-item-checkbox {
+            margin-right: 0.5em; /* Space between checkbox and text */
+            cursor: pointer;
+            vertical-align: middle; /* Align checkbox better with text */
+        }
+        /* Style completed items - targets the list item if marked.js adds a class or the checkbox itself */
+        .note-content ul li.task-list-item > input[type="checkbox"].task-list-item-checkbox:checked {
+           /* You might need sibling selectors depending on markedjs output */
+           /* Example: opacity: 0.7; */
+        }
+        /* If markedjs adds a class like 'task-list-item-done' to the li */
+         .note-content ul li.task-list-item.task-list-item-done {
+             color: var(--secondary-color);
+             text-decoration: line-through;
+         }
+         /* Or target based on checkbox state if no class is added */
+         .note-content ul li.task-list-item:has(> input[type="checkbox"].task-list-item-checkbox:checked) {
+             color: var(--secondary-color);
+             text-decoration: line-through;
+         }
+
+
         .note-timestamp { font-size: 0.8em; color: var(--secondary-color); margin-bottom: 10px; display: block; }
         /* --- Tags --- */
-        .note-tags {
-            margin-bottom: 10px; /* Khoảng cách với timestamp hoặc actions */
-            display: flex;
-            flex-wrap: wrap; /* Cho phép tag xuống dòng nếu không đủ chỗ */
-            gap: 5px; /* Khoảng cách giữa các tag */
-        }
-        .tag-badge {
-            background-color: var(--tag-bg-color);
-            color: var(--tag-text-color);
-            padding: 3px 8px;
-            border-radius: 10px; /* Bo tròn nhiều hơn */
-            font-size: 0.8em;
-            /* cursor: pointer; -- Bật nếu muốn làm chức năng lọc */
-            transition: background-color 0.3s, color 0.3s;
-        }
-        /* .tag-badge:hover { opacity: 0.8; } -- Bật nếu muốn làm chức năng lọc */
-
-        .note-actions { display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto; }
-        .note-actions button { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: opacity 0.2s; background-color: transparent; color: var(--secondary-color); }
+        .note-tags { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag-badge { background-color: var(--tag-bg-color); color: var(--tag-text-color); padding: 3px 8px; border-radius: 10px; font-size: 0.8em; transition: background-color 0.3s, color 0.3s; border: none; cursor: pointer; }
+        .tag-badge:hover { opacity: 0.8; background-color: var(--primary-color); color: var(--primary-text-color); }
+        /* --- Actions --- */
+        .note-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto; }
+        .note-actions button { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: opacity 0.2s, color 0.2s; background-color: transparent; color: var(--secondary-color); }
         .note-actions button:hover { opacity: 0.7; }
         .edit-btn { color: var(--primary-color); }
         body.dark-mode .edit-btn { color: #58a6ff; }
         .delete-btn { color: var(--danger-color); }
+        .pin-btn { color: var(--pin-color); font-size: 1.1em; padding: 5px; line-height: 1; }
+        .pin-btn.pinned { color: var(--pinned-color); }
+        .pin-btn:hover { opacity: 0.7; }
         /* --- Note Edit Mode --- */
         .note textarea.edit-input,
-        .note input[type="text"].edit-tags-input /* Style cho input tag khi sửa */
-        {
-            display: block; /* Chiếm một dòng */
-            width: calc(100% - 12px);
-            margin-bottom: 10px;
-            border: 1px solid var(--input-border-color);
-            border-radius: 5px;
-            background-color: var(--input-bg-color);
-            color: var(--text-color);
-            font-size: 1em;
-            padding: 5px;
-            cursor: text;
-        }
+        .note input[type="text"].edit-tags-input
+        { display: block; width: calc(100% - 12px); margin-bottom: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; padding: 5px; cursor: text; }
         .note textarea.edit-input { min-height: 60px; resize: vertical; font-family: monospace; }
         .save-edit-btn { background-color: var(--primary-color) !important; color: var(--primary-text-color) !important; padding: 5px 10px !important; }
         /* --- Empty State & SortableJS & FAB --- */
@@ -111,9 +125,9 @@
     </header>
 
     <div class="controls-container">
-        <input type="search" id="search-input" placeholder="Tìm kiếm ghi chú...">
+        <input type="search" id="search-input" placeholder="Tìm kiếm ghi chú (nội dung hoặc #tag)...">
         <div id="add-note-panel" class="hidden">
-            <textarea id="new-note-text" placeholder="Nhập nội dung ghi chú (hỗ trợ Markdown)..."></textarea>
+            <textarea id="new-note-text" placeholder="Nhập nội dung ghi chú (hỗ trợ Markdown, dùng - [ ] hoặc - [x] cho checklist)..."></textarea>
             <input type="text" id="new-note-tags" placeholder="Tags (cách nhau bằng dấu phẩy)...">
             <div class="panel-actions">
                  <button id="add-note-btn">Thêm Ghi Chú</button>
@@ -135,7 +149,7 @@
             const notesContainer = document.getElementById('notes-container');
             const addNotePanel = document.getElementById('add-note-panel');
             const newNoteText = document.getElementById('new-note-text');
-            const newNoteTags = document.getElementById('new-note-tags'); // Thêm reference cho input tag
+            const newNoteTags = document.getElementById('new-note-tags');
             const addNoteBtn = document.getElementById('add-note-btn');
             const closeAddPanelBtn = document.getElementById('close-add-panel-btn');
             const showAddPanelBtn = document.getElementById('show-add-panel-btn');
@@ -153,102 +167,283 @@
             // --- Utility: Parse Tags ---
             const parseTags = (tagString) => {
                 if (!tagString) return [];
-                // Tách bằng dấu phẩy, xóa khoảng trắng thừa, loại bỏ tag rỗng, tùy chọn đổi sang chữ thường
                 return tagString.split(',')
-                              .map(tag => tag.trim().toLowerCase()) // Chuyển sang chữ thường
+                              .map(tag => tag.trim().toLowerCase())
                               .filter(tag => tag !== '');
             };
 
             // --- Note Handling ---
-            const saveNotes = () => { localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes)); };
+            const saveNotes = () => {
+                try {
+                    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+                } catch (e) {
+                    console.error("Lỗi lưu ghi chú vào localStorage:", e);
+                    if (e.name === 'QuotaExceededError') {
+                         alert("Lỗi: Dung lượng lưu trữ cục bộ đã đầy. Không thể lưu thay đổi. Hãy thử xóa bớt ghi chú cũ.");
+                    } else {
+                         alert("Đã xảy ra lỗi khi cố gắng lưu ghi chú.");
+                    }
+                }
+            };
 
-            // --- Display Notes (UPDATED FOR TAGS) ---
+            // --- Display Notes (UPDATED FOR CHECKLISTS) ---
             const displayNotes = (filter = '') => {
                 notesContainer.innerHTML = '';
                 const lowerCaseFilter = filter.toLowerCase().trim();
-                const filteredNotes = notes.filter(note => note.text.toLowerCase().includes(lowerCaseFilter));
 
-                if (filteredNotes.length === 0) { notesContainer.innerHTML = `<p class="empty-state">${filter ? 'Không tìm thấy ghi chú...' : 'Chưa có ghi chú nào.'}</p>`; return; }
+                let filteredNotes = notes.filter(note => {
+                    const noteTextLower = (note.text || '').toLowerCase();
+                    const textMatch = noteTextLower.includes(lowerCaseFilter);
+                    const tagMatch = note.tags && note.tags.some(tag => tag.toLowerCase().includes(lowerCaseFilter));
+                    const isSearchingTag = lowerCaseFilter.startsWith('#') && note.tags.some(tag => tag.toLowerCase() === lowerCaseFilter.substring(1));
+                    // Allow filtering by tag using #tag syntax
+                    if (isSearchingTag) return true;
+                     // Original filtering if not searching specific tag
+                    if (lowerCaseFilter.startsWith('#')) return false; // Don't match partial # searches in text if they don't match a full tag
+                    return textMatch || tagMatch;
+                });
+
+                 filteredNotes.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+
+                if (filteredNotes.length === 0) {
+                     notesContainer.innerHTML = `<p class="empty-state">${filter ? 'Không tìm thấy ghi chú...' : 'Chưa có ghi chú nào. Dùng nút + để thêm!'}</p>`; // Updated empty state
+                     if (sortableInstance) {
+                        sortableInstance.destroy();
+                        sortableInstance = null;
+                    }
+                     return;
+                 }
 
                 filteredNotes.forEach(note => {
                     const noteElement = document.createElement('div');
                     noteElement.classList.add('note');
                     noteElement.dataset.id = note.id;
+                    if (note.pinned) {
+                        noteElement.classList.add('pinned-note');
+                    }
 
                     const contentElement = document.createElement('div');
                     contentElement.classList.add('note-content');
-                    if (typeof marked === 'function') { contentElement.innerHTML = marked.parse(note.text || ''); }
-                    else { contentElement.textContent = note.text; }
+                    if (typeof marked === 'function') {
+                        // Ensure marked processes task lists (often default in recent versions)
+                        // Use options if needed: marked.parse(note.text || '', { gfm: true, breaks: true /* optional */ });
+                         contentElement.innerHTML = marked.parse(note.text || '');
 
-                    const timestampElement = document.createElement('small'); timestampElement.classList.add('note-timestamp'); timestampElement.textContent = `Tạo lúc: ${new Date(note.id).toLocaleString('vi-VN')}`;
+                         // *** NEW: Make rendered checkboxes interactive ***
+                         const checkboxes = contentElement.querySelectorAll('input[type="checkbox"]');
+                         checkboxes.forEach(checkbox => {
+                             checkbox.disabled = false; // Enable the checkbox
+                             checkbox.classList.add('task-list-item-checkbox'); // Add class for easy selection
+                             // Add data attributes to link checkbox to its original line? Could be complex.
+                             // We will determine index on click instead for now.
 
-                    // ** Hiển thị Tags **
+                             // Check if markedjs added a class for completed items to the parent LI
+                             // If so, CSS can handle the styling. If not, we might need JS styling here.
+                             // Example: Check parent LI for a class or checked state
+                             const parentLi = checkbox.closest('li');
+                             if (parentLi) {
+                                 parentLi.classList.add('task-list-item'); // Ensure parent li has class for styling
+                                 // Marked might add 'task-list-item-done' or similar automatically based on [x]
+                                 // Checkbox state itself should be handled by the browser/markedjs rendering of [x]
+                                 // Our CSS :has(:checked) handles visual styling if no class is added by marked
+                             }
+                         });
+
+                    } else {
+                        contentElement.textContent = note.text || ''; // Fallback
+                    }
+
+                    const timestampElement = document.createElement('small');
+                    timestampElement.classList.add('note-timestamp');
+                    timestampElement.textContent = `Tạo: ${new Date(note.id).toLocaleString('vi-VN')}`; // Simple timestamp
+
                     const tagsElement = document.createElement('div');
                     tagsElement.classList.add('note-tags');
                     if (note.tags && note.tags.length > 0) {
                         note.tags.forEach(tag => {
-                            const tagBadge = document.createElement('span'); // Dùng span trước, có thể đổi thành button sau
+                            const tagBadge = document.createElement('button');
                             tagBadge.classList.add('tag-badge');
-                            tagBadge.textContent = `#${tag}`; // Thêm dấu # cho đẹp
-                            // tagBadge.dataset.tag = tag; // Lưu tag gốc để lọc sau này
+                            tagBadge.textContent = `#${tag}`;
+                            tagBadge.dataset.tag = tag;
                             tagsElement.appendChild(tagBadge);
                         });
                     }
 
-                    const actionsElement = document.createElement('div'); actionsElement.classList.add('note-actions'); const editBtn = document.createElement('button'); editBtn.classList.add('edit-btn'); editBtn.textContent = 'Sửa'; const deleteBtn = document.createElement('button'); deleteBtn.classList.add('delete-btn'); deleteBtn.textContent = 'Xóa'; actionsElement.appendChild(editBtn); actionsElement.appendChild(deleteBtn);
+                    const actionsElement = document.createElement('div');
+                    actionsElement.classList.add('note-actions');
+
+                    const pinBtn = document.createElement('button');
+                    pinBtn.classList.add('pin-btn');
+                    pinBtn.innerHTML = '&#128204;';
+                    pinBtn.title = note.pinned ? "Bỏ ghim" : "Ghim ghi chú";
+                    if (note.pinned) { pinBtn.classList.add('pinned'); }
+                    actionsElement.appendChild(pinBtn);
+
+                    const editBtn = document.createElement('button');
+                    editBtn.classList.add('edit-btn');
+                    editBtn.textContent = 'Sửa';
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.classList.add('delete-btn');
+                    deleteBtn.textContent = 'Xóa';
+                    actionsElement.appendChild(editBtn);
+                    actionsElement.appendChild(deleteBtn);
 
                     noteElement.appendChild(contentElement);
-                    noteElement.appendChild(tagsElement); // Thêm khu vực tags vào note
+                    noteElement.appendChild(tagsElement);
                     noteElement.appendChild(timestampElement);
                     noteElement.appendChild(actionsElement);
 
                     notesContainer.appendChild(noteElement);
                 });
+
+                initSortable();
              };
 
              // --- Panel Visibility ---
              const showAddPanel = () => { addNotePanel.classList.remove('hidden'); showAddPanelBtn.classList.add('hidden'); newNoteText.focus(); };
-             const hideAddPanel = () => { addNotePanel.classList.add('hidden'); showAddPanelBtn.classList.remove('hidden'); newNoteText.value = ''; newNoteTags.value = ''; /* Xóa luôn ô tags */ };
+             const hideAddPanel = () => { addNotePanel.classList.add('hidden'); showAddPanelBtn.classList.remove('hidden'); newNoteText.value = ''; newNoteTags.value = ''; };
 
-             // --- Add Note (UPDATED FOR TAGS) ---
+             // --- Add Note ---
              const addNote = () => {
-                const noteText = newNoteText.value.trim();
-                const tagString = newNoteTags.value; // Lấy giá trị từ input tags
+                const noteText = newNoteText.value; // Don't trim here, preserve leading/trailing spaces for code/formatting
+                const tagString = newNoteTags.value;
 
-                if (noteText) { // Chỉ cần text là bắt buộc
-                    const tags = parseTags(tagString); // Xử lý tags
+                if (noteText.trim()) { // Trim only for validation check
+                    const tags = parseTags(tagString);
                     const newNote = {
                         id: Date.now(),
-                        text: noteText,
-                        tags: tags // Lưu mảng tags vào object note
+                        text: noteText, // Store original text
+                        tags: tags,
+                        pinned: false
                     };
                     notes.unshift(newNote);
                     saveNotes();
                     displayNotes(searchInput.value);
-                    initSortable();
-                    hideAddPanel(); // Tự động ẩn panel
+                    hideAddPanel();
                 } else {
                     alert("Vui lòng nhập nội dung cho ghi chú!");
                 }
             };
 
             // --- SortableJS ---
-            const handleDragEnd = (evt) => { const oldIndex = evt.oldIndex; const newIndex = evt.newIndex; if (oldIndex !== newIndex) { const movedItem = notes.splice(oldIndex, 1)[0]; if (movedItem) { notes.splice(newIndex, 0, movedItem); saveNotes(); } else { console.error("Lỗi di chuyển note."); } } };
-            const initSortable = () => { if (sortableInstance) { sortableInstance.destroy(); } if (notesContainer && notesContainer.children.length > 0) { sortableInstance = new Sortable(notesContainer, { animation: 150, handle: '.note', ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', dragClass: 'sortable-drag', onEnd: handleDragEnd }); } else { sortableInstance = null; } };
+            const handleDragEnd = (evt) => {
+                const itemIds = Array.from(notesContainer.children)
+                                    .map(el => el.classList.contains('note') ? parseInt(el.dataset.id) : null)
+                                    .filter(id => id !== null);
+                notes.sort((a, b) => {
+                    const indexA = itemIds.indexOf(a.id);
+                    const indexB = itemIds.indexOf(b.id);
+                    if (indexA === -1) return 1;
+                    if (indexB === -1) return -1;
+                    return indexA - indexB;
+                });
+                saveNotes();
+            };
+            const initSortable = () => {
+                 if (sortableInstance) {
+                     sortableInstance.destroy();
+                     sortableInstance = null;
+                 }
+                 if (notesContainer && notesContainer.children.length > 0 && !notesContainer.querySelector('.empty-state')) {
+                    if (typeof Sortable === 'function') {
+                         sortableInstance = new Sortable(notesContainer, {
+                             animation: 150, handle: '.note', // Allow dragging note itself
+                             filter: '.note-content input, .note-content textarea, .note-actions button, .tag-badge', // Prevent drag start on interactive elements
+                             preventOnFilter: true,
+                             ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen', dragClass: 'sortable-drag', onEnd: handleDragEnd
+                         });
+                    } else { console.warn("Sortable.js not loaded. Drag-and-drop disabled."); }
+                 }
+             };
 
-            // --- Load Data ---
+             // --- Load Data ---
              const loadNotesAndInit = () => {
-                 const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'light'; applyTheme(savedTheme);
+                 const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'light';
+                 applyTheme(savedTheme);
                  const storedNotes = localStorage.getItem(NOTES_STORAGE_KEY);
                  if (storedNotes) {
-                     // Đảm bảo notes cũ không có tags vẫn hoạt động
-                     notes = JSON.parse(storedNotes).map(note => ({
-                         ...note,
-                         tags: note.tags || [] // Gán mảng rỗng nếu note cũ chưa có tags
-                     }));
-                 }
-                 displayNotes(); initSortable();
+                     try {
+                         notes = JSON.parse(storedNotes).map(note => ({
+                            ...note,
+                            tags: note.tags || [],
+                            pinned: note.pinned || false
+                         }));
+                     } catch (e) {
+                         console.error("Lỗi đọc dữ liệu ghi chú từ localStorage:", e);
+                         notes = [];
+                     }
+                 } else { notes = []; }
+                 displayNotes();
              };
+
+            // *** NEW: Handle Checklist Toggle ***
+            const handleChecklistToggle = (noteId, clickedCheckbox) => {
+                const noteIndex = notes.findIndex(note => note.id === noteId);
+                if (noteIndex === -1) {
+                    console.error("Không tìm thấy ghi chú để cập nhật checklist:", noteId);
+                    return;
+                }
+
+                const noteData = notes[noteIndex];
+                const noteElement = notesContainer.querySelector(`.note[data-id="${noteId}"] .note-content`); // Target content area
+                 if (!noteElement) {
+                     console.error("Không tìm thấy phần tử DOM của ghi chú:", noteId);
+                     return;
+                 }
+
+                // Find all *interactive* checkboxes within this note's content in the DOM
+                const allCheckboxesInNote = noteElement.querySelectorAll('input[type="checkbox"].task-list-item-checkbox');
+
+                // Find the index of the *specific* checkbox that was clicked among those rendered checkboxes
+                const checkboxIndex = Array.from(allCheckboxesInNote).indexOf(clickedCheckbox);
+
+                if (checkboxIndex === -1) {
+                     console.error("Không thể xác định vị trí checkbox được nhấp trong DOM.");
+                     // Maybe briefly flash the checkbox red or provide feedback?
+                     // Revert the visual change the browser made automatically
+                     clickedCheckbox.checked = !clickedCheckbox.checked;
+                     return;
+                 }
+
+
+                // Now, update the raw Markdown text
+                try {
+                    const taskRegex = /^- \[( |x|X)\]/gm; // Find start of checklist lines: "- [ ]" or "- [x]"
+                    let currentMatchIndex = 0;
+                    let updated = false;
+
+                    const updatedText = noteData.text.replace(taskRegex, (match, currentState) => {
+                         if (currentMatchIndex === checkboxIndex) {
+                             const newState = (currentState === ' ' ? 'x' : ' '); // Toggle state
+                             updated = true; // Mark that we found and updated the item
+                             currentMatchIndex++; // Move to next potential match
+                             return `- [${newState}]`; // Return the modified markdown line start
+                         } else {
+                              currentMatchIndex++; // Move to next potential match
+                              return match; // Return the original match if it's not the one we clicked
+                         }
+                     });
+
+                    if (updated) {
+                         notes[noteIndex].text = updatedText;
+                         saveNotes();
+                         // Optional: Provide subtle feedback like a quick background flash on the line
+                         // Re-rendering the single note could be complex, so full displayNotes is simpler for now
+                         displayNotes(searchInput.value);
+                    } else {
+                         console.error("Không tìm thấy mục checklist tương ứng trong Markdown gốc tại index:", checkboxIndex);
+                         // Revert visual toggle if data wasn't updated
+                         clickedCheckbox.checked = !clickedCheckbox.checked;
+                    }
+                } catch (error) {
+                     console.error("Lỗi khi cập nhật Markdown cho checklist:", error);
+                     // Revert visual toggle on error
+                     clickedCheckbox.checked = !clickedCheckbox.checked;
+                     alert("Đã xảy ra lỗi khi cập nhật checklist.");
+                }
+            };
+
 
             // --- Event Listeners ---
             themeToggleBtn.addEventListener('click', toggleTheme);
@@ -256,82 +451,145 @@
             showAddPanelBtn.addEventListener('click', showAddPanel);
             closeAddPanelBtn.addEventListener('click', hideAddPanel);
             newNoteText.addEventListener('keypress', function(event) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); addNoteBtn.click(); } });
-            searchInput.addEventListener('input', (event) => { displayNotes(event.target.value); initSortable(); });
+            searchInput.addEventListener('input', (event) => { displayNotes(event.target.value); });
 
-            // Event Delegation for Edit/Delete/Save (UPDATED FOR TAGS)
+            // *** UPDATED: Event Delegation on Notes Container ***
             notesContainer.addEventListener('click', (event) => {
                 const target = event.target;
-                const noteElement = target.closest('.note');
-                if (!noteElement) return;
-                const noteId = parseInt(noteElement.dataset.id);
-                const noteData = notes.find(note => note.id === noteId); // Lấy dữ liệu note hiện tại
 
-                // --- Delete Action ---
-                if (target.classList.contains('delete-btn')) { if (confirm('Bạn chắc chắn muốn xóa?')) { notes = notes.filter(note => note.id !== noteId); saveNotes(); displayNotes(searchInput.value); initSortable(); } }
-
-                // --- Edit Action (Start Editing - UPDATED FOR TAGS) ---
-                else if (target.classList.contains('edit-btn') && noteData) {
-                    if(sortableInstance) sortableInstance.option('disabled', true);
-
-                    // Tạo textarea cho nội dung
-                    const editInput = document.createElement('textarea');
-                    editInput.classList.add('edit-input');
-                    editInput.value = noteData.text; // Text gốc (Markdown)
-
-                    // Tạo input cho tags
-                    const editTagsInput = document.createElement('input');
-                    editTagsInput.type = 'text';
-                    editTagsInput.classList.add('edit-tags-input'); // Class để lấy giá trị khi lưu
-                    editTagsInput.placeholder = 'Tags (cách nhau bằng dấu phẩy)...';
-                    editTagsInput.value = (noteData.tags || []).join(', '); // Hiển thị tags hiện tại
-
-                    // Tạo nút Lưu
-                    const saveBtn = document.createElement('button'); saveBtn.classList.add('save-edit-btn'); saveBtn.textContent = 'Lưu';
-
-                    // Thay thế nội dung note bằng các input và nút Lưu
-                    const contentElement = noteElement.querySelector('.note-content');
-                    const tagsElement = noteElement.querySelector('.note-tags');
-                    const timestampElement = noteElement.querySelector('.note-timestamp');
-                    const actionsElement = noteElement.querySelector('.note-actions');
-
-                    // Xóa các phần tử không cần thiết khi sửa
-                    if(tagsElement) tagsElement.remove();
-                    if(timestampElement) timestampElement.remove();
-
-                    // Thay thế content bằng input text, thêm input tags
-                    if(contentElement) contentElement.replaceWith(editInput);
-                    editInput.insertAdjacentElement('afterend', editTagsInput); // Chèn input tags sau input text
-
-                    // Thay thế actions bằng nút Save
-                    if(actionsElement) { actionsElement.innerHTML = ''; actionsElement.appendChild(saveBtn); }
-
-                    editInput.focus(); // Focus vào ô nội dung
-                }
-
-                // --- Save Edit Action (UPDATED FOR TAGS) ---
-                else if (target.classList.contains('save-edit-btn')) {
-                    const editInput = noteElement.querySelector('textarea.edit-input');
-                    const editTagsInput = noteElement.querySelector('input.edit-tags-input'); // Lấy input tags
-
-                    const newText = editInput ? editInput.value.trim() : '';
-                    const newTagString = editTagsInput ? editTagsInput.value : ''; // Lấy chuỗi tags mới
-
-                    if (newText) { // Chỉ cần text là bắt buộc
-                        const noteIndex = notes.findIndex(note => note.id === noteId);
-                        if (noteIndex > -1) {
-                            notes[noteIndex].text = newText;
-                            notes[noteIndex].tags = parseTags(newTagString); // Parse và lưu tags mới
-                        }
-                        saveNotes();
-                        displayNotes(searchInput.value);
-                        initSortable();
-                    } else {
-                        alert("Nội dung không được trống!");
-                        displayNotes(searchInput.value); // Vẽ lại để bỏ trạng thái sửa lỗi
-                        initSortable();
+                // --- Handle Checklist Item Click ---
+                // Check if the click was on an interactive checkbox within note content
+                const checklistCheckbox = target.closest('.task-list-item-checkbox');
+                if (checklistCheckbox && target.tagName === 'INPUT') { // Ensure it's the input itself
+                    const noteElement = target.closest('.note');
+                    if (noteElement) {
+                        const noteId = parseInt(noteElement.dataset.id);
+                        // Call the handler function - pass the ID and the specific checkbox element
+                        handleChecklistToggle(noteId, checklistCheckbox);
+                        // Prevent other actions (like edit/delete) if checklist item clicked
+                        return;
                     }
-                    if(sortableInstance) sortableInstance.option('disabled', false); // Bật lại kéo thả
                 }
+
+                // --- Handle Tag Click ---
+                const tagButton = target.closest('.tag-badge');
+                if (tagButton && tagButton.dataset.tag) {
+                    const clickedTag = tagButton.dataset.tag;
+                    // Update search input and trigger filtering
+                    searchInput.value = `#${clickedTag}`; // Add # for clarity
+                    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    searchInput.focus();
+                    return; // Stop processing here
+                }
+
+                // --- Handle Actions (Pin, Edit, Delete, Save) ---
+                const noteElement = target.closest('.note');
+                if (!noteElement) return; // Exit if click wasn't inside a note element (and not tag/checklist)
+
+                const noteId = parseInt(noteElement.dataset.id);
+                const noteIndex = notes.findIndex(note => note.id === noteId);
+                if (noteIndex === -1) return;
+
+                // --- Handle Pin Click ---
+                const pinButton = target.closest('.pin-btn');
+                if (pinButton) {
+                    notes[noteIndex].pinned = !notes[noteIndex].pinned;
+                    saveNotes();
+                    displayNotes(searchInput.value);
+                    return;
+                }
+
+                // --- Handle Delete Click ---
+                 const deleteButton = target.closest('.delete-btn');
+                 if (deleteButton) {
+                     if (confirm(`Bạn chắc chắn muốn xóa ghi chú này?\n"${notes[noteIndex].text.substring(0, 50)}..."`)) { // Show preview in confirm
+                         notes.splice(noteIndex, 1);
+                         saveNotes();
+                         displayNotes(searchInput.value);
+                     }
+                     return; // Stop here
+                 }
+
+                 // --- Handle Edit Click ---
+                 const editButton = target.closest('.edit-btn');
+                 if (editButton) {
+                     if(sortableInstance) sortableInstance.option('disabled', true); // Disable sorting during edit
+
+                     const noteData = notes[noteIndex];
+                     const editInput = document.createElement('textarea');
+                     editInput.classList.add('edit-input');
+                     editInput.value = noteData.text; // Load original markdown
+
+                     const editTagsInput = document.createElement('input');
+                     editTagsInput.type = 'text';
+                     editTagsInput.classList.add('edit-tags-input');
+                     editTagsInput.placeholder = 'Tags (cách nhau bằng dấu phẩy)...';
+                     editTagsInput.value = (noteData.tags || []).join(', ');
+
+                     const saveBtn = document.createElement('button');
+                     saveBtn.classList.add('save-edit-btn');
+                     saveBtn.textContent = 'Lưu';
+
+                     // Keep existing action buttons (like pin) - replace only edit/delete
+                     const actionsElement = noteElement.querySelector('.note-actions');
+                     const contentElement = noteElement.querySelector('.note-content');
+                     const tagsElement = noteElement.querySelector('.note-tags');
+                     const timestampElement = noteElement.querySelector('.note-timestamp');
+
+                     // Preserve pin button
+                     const pinBtnHTML = actionsElement?.querySelector('.pin-btn')?.outerHTML || '';
+
+                     // Clear existing content/tags/timestamp/actions (except pin btn)
+                     if(contentElement) contentElement.innerHTML = ''; // Clear content area
+                     if(tagsElement) tagsElement.remove();
+                     if(timestampElement) timestampElement.remove();
+
+                     // Add edit fields
+                     if(contentElement) {
+                         contentElement.appendChild(editInput);
+                         contentElement.appendChild(editTagsInput);
+                     } else {
+                         // Fallback if structure is unexpected
+                         noteElement.insertBefore(editTagsInput, actionsElement);
+                         noteElement.insertBefore(editInput, editTagsInput);
+                     }
+
+
+                     // Update actions: Keep pin, add save
+                     if(actionsElement) {
+                         actionsElement.innerHTML = pinBtnHTML; // Restore pin button
+                         actionsElement.appendChild(saveBtn);   // Add save button
+                     }
+
+                     editInput.focus(); // Focus on the textarea
+                     return; // Stop here
+                 }
+
+                 // --- Handle Save Edit Click ---
+                 const saveEditButton = target.closest('.save-edit-btn');
+                 if (saveEditButton) {
+                     const editInput = noteElement.querySelector('textarea.edit-input');
+                     const editTagsInput = noteElement.querySelector('input.edit-tags-input');
+                     const newText = editInput ? editInput.value : ''; // Don't trim, preserve formatting
+                     const newTagString = editTagsInput ? editTagsInput.value : '';
+
+                     if (newText.trim()) { // Trim only for validation
+                         notes[noteIndex].text = newText;
+                         notes[noteIndex].tags = parseTags(newTagString);
+                         saveNotes();
+                         // displayNotes will re-render and re-enable sortable if needed
+                         displayNotes(searchInput.value);
+                     } else {
+                         alert("Nội dung không được trống!");
+                         // Revert UI without saving changes
+                         displayNotes(searchInput.value);
+                     }
+                      // Re-enable sortable explicitly (might be disabled)
+                     if(sortableInstance) sortableInstance.option('disabled', false);
+                     else initSortable(); // Or re-initialize if it was destroyed
+
+                     return; // Stop here
+                 }
             });
 
             // --- Initial Load ---
