@@ -12,26 +12,48 @@
     --success-color: #198754; /* Màu thành công/khôi phục */
     --input-bg-color: #ffffff;
     --input-border-color: #ced4da;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --fab-bg-color: var(--primary-color); /* FAB dùng màu nhấn */
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --shadow-hover-color: rgba(0, 0, 0, 0.12);
+    --fab-bg-color: var(--primary-color);
     --fab-text-color: var(--primary-text-color);
     --tag-bg-color: #e9ecef;
     --tag-text-color: #495057;
-    --pin-color: var(--secondary-color); /* Màu icon pin chưa ghim */
-    --pinned-color: #ffc107; /* Màu icon pin đã ghim (vàng) */
-    --highlight-bg-color: #fff3cd; /* Màu nền highlight text tìm kiếm */
-    --highlight-text-color: #664d03; /* Màu chữ highlight */
-    --archive-color: var(--secondary-color); /* Màu cho các yếu tố liên quan archive */
-    --fade-color-start: rgba(255, 255, 255, 0); /* Màu bắt đầu fade-out content */
-    --fade-color-end: rgba(255, 255, 255, 1); /* Màu kết thúc fade-out content */
+    --pin-color: var(--secondary-color);
+    --pinned-color: #ffc107;
+    --highlight-bg-color: #fff3cd;
+    --highlight-text-color: #664d03;
+    --archive-color: var(--secondary-color);
+    --fade-color-start: rgba(255, 255, 255, 0);
+    --fade-color-end: rgba(255, 255, 255, 1);
     --modal-backdrop-color: rgba(0, 0, 0, 0.6);
     --modal-content-bg: #ffffff;
     --modal-border-color: #ccc;
 
-    /* Biến cho Font & Layout (Có thể được cập nhật bởi JS) */
-    --content-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* Font mặc định */
-    --font-size-scale: 1; /* Tỉ lệ cỡ chữ (1 = 100%) */
-    --note-gap: 20px; /* Khoảng cách giữa các note */
+    /* Tab variables */
+    --tab-bg: transparent;
+    --tab-text: var(--secondary-color);
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(0, 0, 0, 0.03);
+    --tab-hover-text: var(--primary-color);
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+    --tab-radius: 6px 6px 0 0;
+
+    /* Dog-ear variables */
+    --dog-ear-size: 20px;
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(0, 0, 0, 0.1);
+
+    /* Noise texture */
+    --noise-opacity: 0.03;
+    --noise-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+
+
+    /* Biến cho Font & Layout */
+    --content-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-size-scale: 1;
+    --note-gap: 20px;
 
     /* Biến cho Cài đặt Giao diện */
     --setting-section-bg: rgba(0, 0, 0, 0.02);
@@ -41,19 +63,13 @@
     --setting-option-active-text: var(--primary-text-color);
     --setting-option-active-border: var(--primary-color);
 
-    /* Note Color Variables (Light Mode - dùng cho border trái và nền) */
-    --note-color-yellow-bg: #fff9e0;
-    --note-color-yellow-border: #ffecb3;
-    --note-color-blue-bg: #e7f3ff;
-    --note-color-blue-border: #bbdefb;
-    --note-color-green-bg: #e8f5e9;
-    --note-color-green-border: #c8e6c9;
-    --note-color-red-bg: #ffebee;
-    --note-color-red-border: #ffcdd2;
-    --note-color-purple-bg: #f3e5f5;
-    --note-color-purple-border: #e1bee7;
-    --note-color-grey-bg: #f5f5f5;
-    --note-color-grey-border: #e0e0e0;
+    /* Note Color Variables (Light Mode) */
+    --note-color-yellow-bg: #fff9e0; --note-color-yellow-border: #ffecb3;
+    --note-color-blue-bg: #e7f3ff; --note-color-blue-border: #bbdefb;
+    --note-color-green-bg: #e8f5e9; --note-color-green-border: #c8e6c9;
+    --note-color-red-bg: #ffebee; --note-color-red-border: #ffcdd2;
+    --note-color-purple-bg: #f3e5f5; --note-color-purple-border: #e1bee7;
+    --note-color-grey-bg: #f5f5f5; --note-color-grey-border: #e0e0e0;
 }
 
 /* ==================== DARK MODE ==================== */
@@ -62,14 +78,14 @@ body.dark-mode {
      --text-color: #dee2e6;
      --card-bg-color: #343a40;
      --border-color: #495057;
-     /* --primary-color: #0d6efd; */ /* Sẽ bị ghi đè bởi JS nếu chọn màu nhấn khác */
      --primary-text-color: #ffffff;
      --secondary-color: #adb5bd;
      --danger-color: #f84d5e;
      --success-color: #20c997;
      --input-bg-color: #495057;
      --input-border-color: #6c757d;
-     --shadow-color: rgba(0, 0, 0, 0.3);
+     --shadow-color: rgba(0, 0, 0, 0.25);
+     --shadow-hover-color: rgba(0, 0, 0, 0.35);
      --tag-bg-color: #495057;
      --tag-text-color: #dee2e6;
      --pin-color: var(--secondary-color);
@@ -83,25 +99,35 @@ body.dark-mode {
      --modal-content-bg: #343a40;
      --modal-border-color: #495057;
 
+     /* Tab variables for Dark Mode */
+     --tab-bg: transparent;
+     --tab-text: var(--secondary-color);
+     --tab-border-color: var(--border-color);
+     --tab-hover-bg: rgba(255, 255, 255, 0.05);
+     --tab-hover-text: #e9ecef;
+     --tab-active-bg: var(--card-bg-color);
+     --tab-active-border: var(--primary-color);
+     --tab-active-text: var(--primary-color);
+
+     /* Dog-ear variables for Dark Mode */
+     --dog-ear-bg: var(--bg-color);
+     --dog-ear-shadow: rgba(0, 0, 0, 0.3);
+
+     /* Noise texture for Dark Mode */
+     --noise-opacity: 0.04;
+
     /* Biến Cài đặt Dark Mode */
     --setting-section-bg: rgba(255, 255, 255, 0.04);
     --setting-option-border: var(--border-color);
     --setting-option-hover-bg: rgba(255, 255, 255, 0.1);
-    /* Active state vẫn dùng primary color */
 
     /* Note Color Variables (Dark Mode) */
-    --note-color-yellow-bg: #4d4222;
-    --note-color-yellow-border: #806b38;
-    --note-color-blue-bg: #2c3e50;
-    --note-color-blue-border: #5dade2;
-    --note-color-green-bg: #2e4b30;
-    --note-color-green-border: #58d68d;
-    --note-color-red-bg: #5c2b2e;
-    --note-color-red-border: #ec7063;
-    --note-color-purple-bg: #4a235a;
-    --note-color-purple-border: #bb8fce;
-    --note-color-grey-bg: #424242;
-    --note-color-grey-border: #757575;
+    --note-color-yellow-bg: #4d4222; --note-color-yellow-border: #806b38;
+    --note-color-blue-bg: #2c3e50; --note-color-blue-border: #5dade2;
+    --note-color-green-bg: #2e4b30; --note-color-green-border: #58d68d;
+    --note-color-red-bg: #5c2b2e; --note-color-red-border: #ec7063;
+    --note-color-purple-bg: #4a235a; --note-color-purple-border: #bb8fce;
+    --note-color-grey-bg: #424242; --note-color-grey-border: #757575;
 }
 
 /* ==================== CÁC THEME KHÁC (Định nghĩa biến) ==================== */
@@ -110,18 +136,18 @@ body.theme-sepia {
     --text-color: #5b4636;
     --card-bg-color: #fbf5e9;
     --border-color: #dcd0ba;
-    /* --primary-color: #8d6e63; */ /* Giữ màu nhấn đã chọn hoặc đổi */
     --primary-text-color: #ffffff;
     --secondary-color: #a1887f;
     --danger-color: #c62828;
     --success-color: #558b2f;
     --input-bg-color: #fbf5e9;
     --input-border-color: #dcd0ba;
-    --shadow-color: rgba(91, 70, 54, 0.15);
+    --shadow-color: rgba(91, 70, 54, 0.1);
+    --shadow-hover-color: rgba(91, 70, 54, 0.15);
     --tag-bg-color: #e5dace;
     --tag-text-color: #795548;
     --pin-color: var(--secondary-color);
-    --pinned-color: #bcaaa4; /* Màu pin sepia */
+    --pinned-color: #bcaaa4;
     --highlight-bg-color: #efebe9;
     --highlight-text-color: #3e2723;
     --fade-color-start: rgba(251, 245, 233, 0);
@@ -129,22 +155,34 @@ body.theme-sepia {
     --modal-backdrop-color: rgba(91, 70, 54, 0.6);
     --modal-content-bg: #fbf5e9;
     --modal-border-color: #dcd0ba;
+
+    /* Tab variables for Sepia */
+    --tab-bg: transparent;
+    --tab-text: var(--secondary-color);
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(91, 70, 54, 0.05);
+    --tab-hover-text: var(--primary-color);
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+
+    /* Dog-ear variables for Sepia */
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(91, 70, 54, 0.1);
+
+    /* Noise texture for Sepia */
+     --noise-opacity: 0.05;
+
     --setting-section-bg: rgba(91, 70, 54, 0.05);
     --setting-option-hover-bg: rgba(91, 70, 54, 0.1);
 
-    /* Note Colors Sepia (Ví dụ) */
-    --note-color-yellow-bg: #f9f3d6;
-    --note-color-yellow-border: #d7ccc8;
-    --note-color-blue-bg: #e8eaf6;
-    --note-color-blue-border: #b0bec5;
-    --note-color-green-bg: #e8f5e9;
-    --note-color-green-border: #a5d6a7;
-    --note-color-red-bg: #ffebee;
-    --note-color-red-border: #ef9a9a;
-    --note-color-purple-bg: #f3e5f5;
-    --note-color-purple-border: #ce93d8;
-    --note-color-grey-bg: #f5f5f5;
-    --note-color-grey-border: #dcd0ba;
+    /* Note Colors Sepia */
+    --note-color-yellow-bg: #f9f3d6; --note-color-yellow-border: #d7ccc8;
+    --note-color-blue-bg: #e8eaf6; --note-color-blue-border: #b0bec5;
+    --note-color-green-bg: #e8f5e9; --note-color-green-border: #a5d6a7;
+    --note-color-red-bg: #ffebee; --note-color-red-border: #ef9a9a;
+    --note-color-purple-bg: #f3e5f5; --note-color-purple-border: #ce93d8;
+    --note-color-grey-bg: #f5f5f5; --note-color-grey-border: #dcd0ba;
 }
 
 body.theme-solarized-light {
@@ -152,14 +190,14 @@ body.theme-solarized-light {
     --text-color: #657b83; /* base00 */
     --card-bg-color: #eee8d5; /* base2 */
     --border-color: #93a1a1; /* base01 */
-    /* --primary-color: #268bd2; */ /* blue - Sẽ bị ghi đè bởi JS */
     --primary-text-color: #fdf6e3; /* base3 */
     --secondary-color: #839496; /* base0 */
     --danger-color: #dc322f; /* red */
     --success-color: #859900; /* green */
     --input-bg-color: #eee8d5;
     --input-border-color: #93a1a1;
-    --shadow-color: rgba(88, 110, 117, 0.15); /* base01 với alpha */
+    --shadow-color: rgba(88, 110, 117, 0.1);
+    --shadow-hover-color: rgba(88, 110, 117, 0.15);
     --tag-bg-color: #eee8d5;
     --tag-text-color: #586e75; /* base01 */
     --pin-color: var(--secondary-color);
@@ -168,25 +206,37 @@ body.theme-solarized-light {
     --highlight-text-color: #cb4b16; /* orange */
     --fade-color-start: rgba(238, 232, 213, 0);
     --fade-color-end: rgba(238, 232, 213, 1);
-    --modal-backdrop-color: rgba(238, 232, 213, 0.6); /* base2 với alpha */
+    --modal-backdrop-color: rgba(238, 232, 213, 0.6);
     --modal-content-bg: #fdf6e3; /* base3 */
     --modal-border-color: #eee8d5; /* base2 */
+
+    /* Tab variables for Solarized Light */
+    --tab-bg: transparent;
+    --tab-text: var(--secondary-color);
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(0, 43, 54, 0.04);
+    --tab-hover-text: #586e75; /* base01 */
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+
+    /* Dog-ear variables for Solarized Light */
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(88, 110, 117, 0.1);
+
+    /* Noise texture for Solarized Light */
+     --noise-opacity: 0.03;
+
     --setting-section-bg: rgba(0, 43, 54, 0.03);
     --setting-option-hover-bg: rgba(0, 43, 54, 0.07);
 
-     /* Note Colors Solarized Light (Ví dụ) */
-    --note-color-yellow-bg: #fcf4b3;
-    --note-color-yellow-border: #b58900; /* yellow */
-    --note-color-blue-bg: #dfefff;
-    --note-color-blue-border: #268bd2; /* blue */
-    --note-color-green-bg: #edf8d7;
-    --note-color-green-border: #859900; /* green */
-    --note-color-red-bg: #ffe4e1;
-    --note-color-red-border: #dc322f; /* red */
-    --note-color-purple-bg: #efebff;
-    --note-color-purple-border: #6c71c4; /* violet */
-    --note-color-grey-bg: #eee8d5;
-    --note-color-grey-border: #93a1a1;
+     /* Note Colors Solarized Light */
+    --note-color-yellow-bg: #fcf4b3; --note-color-yellow-border: #b58900;
+    --note-color-blue-bg: #dfefff; --note-color-blue-border: #268bd2;
+    --note-color-green-bg: #edf8d7; --note-color-green-border: #859900;
+    --note-color-red-bg: #ffe4e1; --note-color-red-border: #dc322f;
+    --note-color-purple-bg: #efebff; --note-color-purple-border: #6c71c4;
+    --note-color-grey-bg: #eee8d5; --note-color-grey-border: #93a1a1;
 }
 
 body.theme-solarized-dark {
@@ -194,14 +244,14 @@ body.theme-solarized-dark {
      --text-color: #839496; /* base0 */
      --card-bg-color: #073642; /* base02 */
      --border-color: #586e75; /* base01 */
-     /* --primary-color: #268bd2; */ /* blue */
      --primary-text-color: #fdf6e3; /* base3 */
      --secondary-color: #586e75; /* base01 */
      --danger-color: #dc322f; /* red */
      --success-color: #859900; /* green */
      --input-bg-color: #073642;
      --input-border-color: #586e75;
-     --shadow-color: rgba(0, 0, 0, 0.3);
+     --shadow-color: rgba(0, 0, 0, 0.25);
+     --shadow-hover-color: rgba(0, 0, 0, 0.35);
      --tag-bg-color: #586e75;
      --tag-text-color: #eee8d5; /* base2 */
      --pin-color: var(--secondary-color);
@@ -215,24 +265,278 @@ body.theme-solarized-dark {
      --modal-content-bg: #073642;
      --modal-border-color: #586e75;
 
+     /* Tab variables for Solarized Dark */
+     --tab-bg: transparent;
+     --tab-text: var(--secondary-color);
+     --tab-border-color: var(--border-color);
+     --tab-hover-bg: rgba(253, 246, 227, 0.05);
+     --tab-hover-text: #93a1a1; /* base0 */
+     --tab-active-bg: var(--card-bg-color);
+     --tab-active-border: var(--primary-color);
+     --tab-active-text: var(--primary-color);
+
+     /* Dog-ear variables for Solarized Dark */
+     --dog-ear-bg: var(--bg-color);
+     --dog-ear-shadow: rgba(0, 0, 0, 0.3);
+
+     /* Noise texture for Solarized Dark */
+     --noise-opacity: 0.04;
+
     --setting-section-bg: rgba(253, 246, 227, 0.05);
     --setting-option-hover-bg: rgba(253, 246, 227, 0.1);
-    /* Active state vẫn dùng primary color */
 
     /* Note Color Variables (Solarized Dark) */
-    --note-color-yellow-bg: #3a300a;
-    --note-color-yellow-border: #b58900;
-    --note-color-blue-bg: #0d3f54;
-    --note-color-blue-border: #268bd2;
-    --note-color-green-bg: #2a3d00;
-    --note-color-green-border: #859900;
-    --note-color-red-bg: #4d1c1a;
-    --note-color-red-border: #dc322f;
-    --note-color-purple-bg: #2d2f51;
-    --note-color-purple-border: #6c71c4;
-    --note-color-grey-bg: #073642;
-    --note-color-grey-border: #586e75;
+    --note-color-yellow-bg: #3a300a; --note-color-yellow-border: #b58900;
+    --note-color-blue-bg: #0d3f54; --note-color-blue-border: #268bd2;
+    --note-color-green-bg: #2a3d00; --note-color-green-border: #859900;
+    --note-color-red-bg: #4d1c1a; --note-color-red-border: #dc322f;
+    --note-color-purple-bg: #2d2f51; --note-color-purple-border: #6c71c4;
+    --note-color-grey-bg: #073642; --note-color-grey-border: #586e75;
 }
+
+/* ==================== NEW THEMES ==================== */
+
+/* --- Nord Theme --- */
+body.theme-nord {
+    --bg-color: #2E3440; /* nord0 */
+    --text-color: #D8DEE9; /* nord4 */
+    --card-bg-color: #3B4252; /* nord1 */
+    --border-color: #4C566A; /* nord3 */
+    --primary-color: #88C0D0; /* nord8 - Frost Cyan */
+    --primary-text-color: #2E3440; /* nord0 - High contrast for buttons */
+    --secondary-color: #E5E9F0; /* nord6 - Lighter text */
+    --danger-color: #BF616A; /* nord11 - Red */
+    --success-color: #A3BE8C; /* nord14 - Green */
+    --input-bg-color: #434C5E; /* nord2 */
+    --input-border-color: #4C566A; /* nord3 */
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --shadow-hover-color: rgba(0, 0, 0, 0.3);
+    --tag-bg-color: #4C566A; /* nord3 */
+    --tag-text-color: #ECEFF4; /* nord5 */
+    --pin-color: var(--secondary-color);
+    --pinned-color: #EBCB8B; /* nord13 - Yellow */
+    --highlight-bg-color: #4C566A;
+    --highlight-text-color: #EBCB8B; /* Yellow highlight text */
+    --fade-color-start: rgba(59, 66, 82, 0); /* nord1 */
+    --fade-color-end: rgba(59, 66, 82, 1);
+    --modal-backdrop-color: rgba(46, 52, 64, 0.7); /* nord0 */
+    --modal-content-bg: #3B4252; /* nord1 */
+    --modal-border-color: #4C566A; /* nord3 */
+    --tab-bg: transparent;
+    --tab-text: #D8DEE9; /* nord4 */
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(216, 222, 233, 0.05);
+    --tab-hover-text: #ECEFF4; /* nord5 */
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(0, 0, 0, 0.3);
+    --noise-opacity: 0.03;
+    --setting-section-bg: rgba(216, 222, 233, 0.04);
+    --setting-option-hover-bg: rgba(216, 222, 233, 0.1);
+    /* Note Colors Nord (using Nord palette) */
+    --note-color-yellow-bg: #4a453a; --note-color-yellow-border: #EBCB8B; /* nord13 */
+    --note-color-blue-bg: #3a485e; --note-color-blue-border: #81A1C1; /* nord10 */
+    --note-color-green-bg: #404c41; --note-color-green-border: #A3BE8C; /* nord14 */
+    --note-color-red-bg: #513a3f; --note-color-red-border: #BF616A; /* nord11 */
+    --note-color-purple-bg: #4a425e; --note-color-purple-border: #B48EAD; /* nord15 */
+    --note-color-grey-bg: #434C5E; --note-color-grey-border: #4C566A; /* nord2, nord3 */
+}
+
+/* --- Gruvbox Dark Theme --- */
+body.theme-gruvbox-dark {
+    --bg-color: #282828;
+    --text-color: #ebdbb2;
+    --card-bg-color: #3c3836;
+    --border-color: #504945;
+    --primary-color: #fabd2f; /* yellow */
+    --primary-text-color: #282828; /* High contrast */
+    --secondary-color: #a89984;
+    --danger-color: #fb4934; /* red */
+    --success-color: #b8bb26; /* green */
+    --input-bg-color: #504945;
+    --input-border-color: #665c54;
+    --shadow-color: rgba(0, 0, 0, 0.25);
+    --shadow-hover-color: rgba(0, 0, 0, 0.35);
+    --tag-bg-color: #504945;
+    --tag-text-color: #ebdbb2;
+    --pin-color: var(--secondary-color);
+    --pinned-color: #fabd2f; /* yellow */
+    --highlight-bg-color: #504945;
+    --highlight-text-color: #fabd2f; /* yellow */
+    --fade-color-start: rgba(60, 56, 54, 0);
+    --fade-color-end: rgba(60, 56, 54, 1);
+    --modal-backdrop-color: rgba(40, 40, 40, 0.7);
+    --modal-content-bg: #3c3836;
+    --modal-border-color: #504945;
+    --tab-bg: transparent;
+    --tab-text: #a89984;
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(235, 219, 178, 0.05);
+    --tab-hover-text: #ebdbb2;
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(0, 0, 0, 0.3);
+    --noise-opacity: 0.05;
+    --setting-section-bg: rgba(235, 219, 178, 0.04);
+    --setting-option-hover-bg: rgba(235, 219, 178, 0.1);
+    /* Note Colors Gruvbox Dark */
+    --note-color-yellow-bg: #4a453a; --note-color-yellow-border: #fabd2f;
+    --note-color-blue-bg: #374a5a; --note-color-blue-border: #83a598; /* blue */
+    --note-color-green-bg: #464a3a; --note-color-green-border: #b8bb26;
+    --note-color-red-bg: #513a3f; --note-color-red-border: #fb4934;
+    --note-color-purple-bg: #4a425e; --note-color-purple-border: #d3869b; /* purple */
+    --note-color-grey-bg: #504945; --note-color-grey-border: #665c54;
+}
+
+/* --- Gruvbox Light Theme --- */
+body.theme-gruvbox-light {
+    --bg-color: #fbf1c7;
+    --text-color: #3c3836;
+    --card-bg-color: #ebdbb2;
+    --border-color: #d5c4a1;
+    --primary-color: #d65d0e; /* orange */
+    --primary-text-color: #fbf1c7; /* High contrast */
+    --secondary-color: #7c6f64;
+    --danger-color: #cc241d; /* red */
+    --success-color: #98971a; /* green */
+    --input-bg-color: #f9f5d7; /* lighter */
+    --input-border-color: #d5c4a1;
+    --shadow-color: rgba(60, 56, 54, 0.1);
+    --shadow-hover-color: rgba(60, 56, 54, 0.15);
+    --tag-bg-color: #d5c4a1;
+    --tag-text-color: #3c3836;
+    --pin-color: var(--secondary-color);
+    --pinned-color: #d79921; /* yellow */
+    --highlight-bg-color: #d5c4a1;
+    --highlight-text-color: #af3a03; /* dark orange */
+    --fade-color-start: rgba(235, 219, 178, 0);
+    --fade-color-end: rgba(235, 219, 178, 1);
+    --modal-backdrop-color: rgba(251, 241, 199, 0.6);
+    --modal-content-bg: #f9f5d7;
+    --modal-border-color: #d5c4a1;
+    --tab-bg: transparent;
+    --tab-text: #7c6f64;
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(60, 56, 54, 0.05);
+    --tab-hover-text: #282828; /* darker */
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(60, 56, 54, 0.1);
+    --noise-opacity: 0.04;
+    --setting-section-bg: rgba(60, 56, 54, 0.03);
+    --setting-option-hover-bg: rgba(60, 56, 54, 0.07);
+    /* Note Colors Gruvbox Light */
+    --note-color-yellow-bg: #f2e5bc; --note-color-yellow-border: #d79921;
+    --note-color-blue-bg: #d3e8e5; --note-color-blue-border: #458588; /* blue */
+    --note-color-green-bg: #e4e5bf; --note-color-green-border: #98971a;
+    --note-color-red-bg: #f4cfcd; --note-color-red-border: #cc241d;
+    --note-color-purple-bg: #e9d1d9; --note-color-purple-border: #b16286; /* purple */
+    --note-color-grey-bg: #d5c4a1; --note-color-grey-border: #bdae93;
+}
+
+/* --- Dracula Theme --- */
+body.theme-dracula {
+    --bg-color: #282a36;
+    --text-color: #f8f8f2;
+    --card-bg-color: #44475a;
+    --border-color: #6272a4; /* Comment color */
+    --primary-color: #bd93f9; /* Purple */
+    --primary-text-color: #f8f8f2;
+    --secondary-color: #f8f8f2; /* Foreground for secondary text too */
+    --danger-color: #ff5555; /* Red */
+    --success-color: #50fa7b; /* Green */
+    --input-bg-color: #282a36; /* Background */
+    --input-border-color: #6272a4;
+    --shadow-color: rgba(0, 0, 0, 0.25);
+    --shadow-hover-color: rgba(0, 0, 0, 0.35);
+    --tag-bg-color: #6272a4;
+    --tag-text-color: #f8f8f2;
+    --pin-color: #6272a4;
+    --pinned-color: #f1fa8c; /* Yellow */
+    --highlight-bg-color: #44475a;
+    --highlight-text-color: #f1fa8c; /* Yellow */
+    --fade-color-start: rgba(68, 71, 90, 0);
+    --fade-color-end: rgba(68, 71, 90, 1);
+    --modal-backdrop-color: rgba(40, 42, 54, 0.7);
+    --modal-content-bg: #44475a;
+    --modal-border-color: #6272a4;
+    --tab-bg: transparent;
+    --tab-text: #bd93f9; /* Purple */
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(248, 248, 242, 0.05);
+    --tab-hover-text: #ff79c6; /* Pink */
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(0, 0, 0, 0.3);
+    --noise-opacity: 0.03;
+    --setting-section-bg: rgba(248, 248, 242, 0.04);
+    --setting-option-hover-bg: rgba(248, 248, 242, 0.1);
+    /* Note Colors Dracula */
+    --note-color-yellow-bg: #4a483a; --note-color-yellow-border: #f1fa8c;
+    --note-color-blue-bg: #3a5068; --note-color-blue-border: #8be9fd; /* Cyan */
+    --note-color-green-bg: #304d3a; --note-color-green-border: #50fa7b;
+    --note-color-red-bg: #5c3030; --note-color-red-border: #ff5555;
+    --note-color-purple-bg: #4a425e; --note-color-purple-border: #bd93f9;
+    --note-color-grey-bg: #6272a4; --note-color-grey-border: #44475a;
+}
+
+/* --- Monochrome Theme (Light) --- */
+body.theme-monochrome {
+    --bg-color: #f5f5f5; /* Grey 100 */
+    --text-color: #212121; /* Grey 900 */
+    --card-bg-color: #ffffff; /* White */
+    --border-color: #e0e0e0; /* Grey 300 */
+    --primary-color: #616161; /* Grey 700 */
+    --primary-text-color: #ffffff;
+    --secondary-color: #757575; /* Grey 600 */
+    --danger-color: #757575; /* Using grey for less distraction */
+    --success-color: #616161; /* Using grey for less distraction */
+    --input-bg-color: #ffffff;
+    --input-border-color: #bdbdbd; /* Grey 400 */
+    --shadow-color: rgba(0, 0, 0, 0.08);
+    --shadow-hover-color: rgba(0, 0, 0, 0.12);
+    --tag-bg-color: #eeeeee; /* Grey 200 */
+    --tag-text-color: #616161; /* Grey 700 */
+    --pin-color: var(--secondary-color);
+    --pinned-color: #424242; /* Grey 800 */
+    --highlight-bg-color: #e0e0e0;
+    --highlight-text-color: #212121;
+    --fade-color-start: rgba(255, 255, 255, 0);
+    --fade-color-end: rgba(255, 255, 255, 1);
+    --modal-backdrop-color: rgba(0, 0, 0, 0.6);
+    --modal-content-bg: #ffffff;
+    --modal-border-color: #e0e0e0;
+    --tab-bg: transparent;
+    --tab-text: var(--secondary-color);
+    --tab-border-color: var(--border-color);
+    --tab-hover-bg: rgba(0, 0, 0, 0.03);
+    --tab-hover-text: var(--primary-color);
+    --tab-active-bg: var(--card-bg-color);
+    --tab-active-border: var(--primary-color);
+    --tab-active-text: var(--primary-color);
+    --dog-ear-bg: var(--bg-color);
+    --dog-ear-shadow: rgba(0, 0, 0, 0.1);
+    --noise-opacity: 0.02; /* Very subtle noise */
+    --setting-section-bg: rgba(0, 0, 0, 0.02);
+    --setting-option-hover-bg: rgba(0, 0, 0, 0.05);
+    /* Note Colors Monochrome (Using grayscale borders) */
+    --note-color-yellow-bg: #fafafa; --note-color-yellow-border: #bdbdbd;
+    --note-color-blue-bg: #f5f5f5; --note-color-blue-border: #9e9e9e;
+    --note-color-green-bg: #eeeeee; --note-color-green-border: #757575;
+    --note-color-red-bg: #f5f5f5; --note-color-red-border: #616161;
+    --note-color-purple-bg: #fafafa; --note-color-purple-border: #9e9e9e;
+    --note-color-grey-bg: #eeeeee; --note-color-grey-border: #bdbdbd;
+}
+
+/* ================================================= */
 
 
 /* --- CSS Cơ bản --- */
@@ -247,16 +551,67 @@ body {
     transition: background-color 0.3s, color 0.3s, font-size 0.1s linear;
 }
 
-/* --- Header & Controls --- */
-.app-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-.app-header h1 { margin: 0; font-size: 1.8em; color: var(--primary-color); white-space: nowrap; }
-.header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.header-actions button { padding: 8px 12px; background-color: var(--secondary-color); color: var(--primary-text-color); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; font-size: 0.9em; white-space: nowrap; line-height: 1.4; } /* Thêm line-height */
+/* --- Header & Controls (UPDATED) --- */
+.app-header {
+    display: flex;
+    justify-content: space-between; /* Đẩy title-container và header-actions ra hai bên */
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu không đủ chỗ */
+    gap: 15px; /* Khoảng cách giữa các nhóm */
+    margin-bottom: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+/* NEW: Container for Title and Quick Note Button */
+.title-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa title và nút */
+    flex-grow: 1; /* Cho phép chiếm không gian */
+    min-width: 0; /* Giúp flexbox thu nhỏ nếu cần */
+}
+.app-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden; /* Tránh title quá dài làm vỡ layout */
+    text-overflow: ellipsis;
+}
+/* NEW: Style for Quick Note Button */
+.quick-note-button {
+    padding: 5px 8px; /* Padding nhỏ hơn nút thường */
+    background-color: transparent;
+    color: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em; /* Cỡ icon */
+    line-height: 1; /* Căn icon */
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    flex-shrink: 0; /* Không bị co lại */
+}
+.quick-note-button:hover {
+    background-color: var(--tab-hover-bg); /* Dùng màu hover của tab */
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0; /* Không bị co lại */
+}
+.header-actions button { padding: 8px 12px; background-color: var(--secondary-color); color: var(--primary-text-color); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; font-size: 0.9em; white-space: nowrap; line-height: 1.4; }
 .header-actions button:hover { opacity: 0.85; }
 #export-notes-btn { background-color: var(--success-color); }
 #import-notes-btn { background-color: var(--primary-color); }
-#manage-templates-btn { background-color: #6f42c1; }
-body.dark-mode #manage-templates-btn { background-color: #8a63d2; }
+#manage-notebooks-btn { background-color: #6f42c1; }
+body.dark-mode #manage-notebooks-btn { background-color: #8a63d2; }
+#manage-templates-btn { background-color: #17a2b8; }
+body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 #empty-trash-btn { background-color: var(--danger-color); }
 #empty-trash-btn.hidden { display: none !important; }
 #view-archive-btn { background-color: var(--secondary-color); }
@@ -264,9 +619,83 @@ body.dark-mode #manage-templates-btn { background-color: #8a63d2; }
 #view-trash-btn { background-color: var(--secondary-color); }
 #view-trash-btn.viewing-trash { background-color: var(--danger-color); font-weight: bold; }
 #settings-btn { background-color: #ffc107; color: #333; }
-#theme-toggle-btn { background-color: var(--secondary-color); min-width: 110px; text-align: center; } /* Đảm bảo đủ rộng cho icon + text */
+#theme-toggle-btn { background-color: var(--secondary-color); min-width: 110px; text-align: center; }
 
 .archive-status, .trash-status { width: 100%; text-align: center; padding: 8px; margin-top: 5px; margin-bottom: 15px; font-size: 0.9em; font-style: italic; color: var(--secondary-color); border-radius: 4px; background-color: var(--setting-section-bg); }
+
+/* === Notebook Tabs Styles === */
+.notebook-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2px;
+    padding: 0;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--tab-border-color);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-color) var(--bg-color);
+}
+.notebook-tabs::-webkit-scrollbar { height: 6px; }
+.notebook-tabs::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 3px; }
+.notebook-tabs::-webkit-scrollbar-thumb { background-color: var(--secondary-color); border-radius: 3px; }
+.notebook-tabs::-webkit-scrollbar-thumb:hover { background-color: var(--primary-color); }
+
+.tab-button {
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background-color: var(--tab-bg);
+    color: var(--tab-text);
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+    border-radius: var(--tab-radius);
+    margin-bottom: -1px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.tab-button:hover {
+    color: var(--tab-hover-text);
+    background-color: var(--tab-hover-bg);
+}
+
+.tab-button.active {
+    color: var(--tab-active-text);
+    background-color: var(--tab-active-bg);
+    border-color: var(--tab-border-color);
+    border-bottom-color: var(--tab-active-bg);
+    font-weight: 600;
+    z-index: 1;
+}
+
+.add-tab-button {
+    padding: 8px 12px;
+    margin-left: 8px;
+    margin-bottom: 2px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 50%;
+    background-color: transparent;
+    color: var(--secondary-color);
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s, transform 0.1s;
+    line-height: 1;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+.add-tab-button:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: var(--tab-hover-bg);
+    transform: scale(1.1);
+}
+
+
 .controls-container { margin-bottom: 30px; position: relative; }
 #search-input { display: block; width: calc(100% - 22px); padding: 10px; margin-bottom: 20px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; }
 #search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
@@ -288,42 +717,141 @@ body.dark-mode #manage-templates-btn { background-color: #8a63d2; }
 #add-note-panel #close-add-panel-btn:hover { opacity: 0.85; }
 
 
-/* --- Notes Container & Note Card --- */
+/* --- Notes Container & Note Card (IMPROVED + DOG-EAR + NOISE) --- */
 #notes-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--note-gap, 20px); }
-.note { background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px var(--shadow-color); display: flex; flex-direction: column; transition: box-shadow 0.2s, background-color 0.3s, border-color 0.3s, border-left-color 0.3s; cursor: grab; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; position: relative; overflow: hidden; min-height: 150px; border-left: 5px solid transparent; }
+.note {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px 18px;
+    box-shadow: 0 1px 3px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.25s ease-in-out, transform 0.25s ease-in-out, background-color 0.3s, border-color 0.3s, border-left-color 0.3s;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    position: relative;
+    overflow: hidden;
+    min-height: 150px;
+    border-left: 5px solid transparent;
+    background-color: var(--card-bg-color);
+}
+
+/* Noise texture overlay */
+.note::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: var(--noise-url);
+    opacity: var(--noise-opacity);
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.3s;
+}
+
+
 .note:active { cursor: grabbing; }
-.note:hover { box-shadow: 0 4px 10px var(--shadow-color); }
-.pinned-bookmark-icon { position: absolute; top: -10px; right: -10px; font-size: 2.8em; color: var(--pinned-color); opacity: 0.5; pointer-events: none; transform: rotate(45deg); z-index: 0; transition: color 0.3s, opacity 0.3s; }
+.note:hover {
+    box-shadow: 0 5px 15px var(--shadow-hover-color);
+    transform: translateY(-3px);
+}
+
+/* Dog-ear effect */
+.note::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-width: 0 var(--dog-ear-size) var(--dog-ear-size) 0;
+    border-style: solid;
+    border-color: transparent transparent var(--dog-ear-bg) var(--dog-ear-bg);
+    box-shadow: -1px 1px 2px var(--dog-ear-shadow);
+    z-index: 1;
+    transition: border-color 0.3s;
+}
+/* Adjust dog-ear color for colored notes */
+.note.note-color-yellow::before { border-color: transparent transparent var(--note-color-yellow-bg) var(--note-color-yellow-bg); }
+.note.note-color-blue::before { border-color: transparent transparent var(--note-color-blue-bg) var(--note-color-blue-bg); }
+.note.note-color-green::before { border-color: transparent transparent var(--note-color-green-bg) var(--note-color-green-bg); }
+.note.note-color-red::before { border-color: transparent transparent var(--note-color-red-bg) var(--note-color-red-bg); }
+.note.note-color-purple::before { border-color: transparent transparent var(--note-color-purple-bg) var(--note-color-purple-bg); }
+.note.note-color-grey::before { border-color: transparent transparent var(--note-color-grey-bg) var(--note-color-grey-bg); }
+
+
+.pinned-bookmark-icon { position: absolute; top: -10px; right: -10px; font-size: 2.8em; color: var(--pinned-color); opacity: 0.5; pointer-events: none; transform: rotate(45deg); z-index: 2; transition: color 0.3s, opacity 0.3s; }
+/* Note color classes - Update background-color only */
 .note.note-color-yellow { background-color: var(--note-color-yellow-bg); border-left-color: var(--note-color-yellow-border); }
 .note.note-color-blue { background-color: var(--note-color-blue-bg); border-left-color: var(--note-color-blue-border); }
 .note.note-color-green { background-color: var(--note-color-green-bg); border-left-color: var(--note-color-green-border); }
 .note.note-color-red { background-color: var(--note-color-red-bg); border-left-color: var(--note-color-red-border); }
 .note.note-color-purple { background-color: var(--note-color-purple-bg); border-left-color: var(--note-color-purple-border); }
 .note.note-color-grey { background-color: var(--note-color-grey-bg); border-left-color: var(--note-color-grey-border); }
-.note-title { font-size: 1.15em; font-weight: 600; margin: 0 0 10px 0; word-wrap: break-word; color: var(--primary-color); position: relative; z-index: 1; }
-.note-content { flex-grow: 1; margin-bottom: 10px; word-wrap: break-word; white-space: pre-wrap; font-size: 1em; position: relative; z-index: 1; max-height: 200px; overflow: hidden; font-family: var(--content-font-family, inherit); line-height: 1.5; }
+.note[class*="note-color-"] { border-top-color: transparent; border-right-color: transparent; border-bottom-color: transparent; }
+
+.note-title {
+    font-size: 1.15em;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    word-wrap: break-word;
+    color: var(--primary-color);
+    position: relative;
+    z-index: 1;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+}
+.note-content {
+    flex-grow: 1;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 1em;
+    position: relative;
+    z-index: 1;
+    max-height: 200px;
+    overflow: hidden;
+    font-family: var(--content-font-family, inherit);
+    line-height: 1.5;
+    color: var(--text-color);
+}
 .note-content.has-overflow { position: relative; }
 .note-content.has-overflow::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: linear-gradient(to top, var(--fade-color-end), var(--fade-color-start)); pointer-events: none; z-index: 2; }
 .read-more-btn { display: block; margin: 5px auto 0 auto; padding: 3px 10px; font-size: 0.8em; color: var(--primary-color); background-color: transparent; border: none; border-radius: 4px; cursor: pointer; text-align: center; z-index: 3; position: relative; text-decoration: underline; opacity: 0.8; }
 .read-more-btn:hover { opacity: 1; }
-.note-timestamp { font-size: 0.8em; color: var(--secondary-color); margin-bottom: 10px; display: block; position: relative; z-index: 1; }
+.note-timestamp { font-size: 0.8em; color: var(--secondary-color); margin-bottom: 10px; display: block; position: relative; z-index: 1; opacity: 0.8; }
 .note-tags { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; position: relative; z-index: 1; }
-.tag-badge { background-color: var(--tag-bg-color); color: var(--tag-text-color); padding: 3px 8px; border-radius: 10px; font-size: 0.8em; transition: background-color 0.2s, color 0.2s, opacity 0.2s; border: none; cursor: pointer; line-height: 1.4; }
-.tag-badge:hover { opacity: 0.8; background-color: var(--primary-color); color: var(--primary-text-color); }
-.note-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto; position: relative; z-index: 1; }
-.note-actions button { padding: 5px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: opacity 0.2s, color 0.2s, background-color 0.2s; background-color: transparent; color: var(--secondary-color); line-height: 1; }
-.note-actions button:hover { opacity: 0.7; background-color: rgba(128, 128, 128, 0.1); }
+.tag-badge { background-color: var(--tag-bg-color); color: var(--tag-text-color); padding: 3px 8px; border-radius: 10px; font-size: 0.8em; transition: background-color 0.2s, color 0.2s, opacity 0.2s; border: none; cursor: pointer; line-height: 1.4; opacity: 0.9; }
+.tag-badge:hover { opacity: 1; background-color: var(--primary-color); color: var(--primary-text-color); }
+.note-actions { display: flex; justify-content: flex-end; align-items: center; gap: 5px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto; position: relative; z-index: 1; }
+.note-actions button { padding: 5px; border: none; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1em; transition: opacity 0.2s, color 0.2s, background-color 0.2s; background-color: transparent; color: var(--secondary-color); line-height: 1; }
+.note-actions button:hover {
+    opacity: 1;
+    background-color: rgba(128, 128, 128, 0.15);
+}
 .note-actions .edit-btn { color: var(--primary-color); }
 .note-actions .delete-btn, .note-actions .delete-permanent-btn { color: var(--danger-color); }
-.note-actions .pin-btn { color: var(--pin-color); font-size: 1.1em; }
+.note-actions .pin-btn { color: var(--pin-color); }
 .note-actions .pin-btn.pinned { color: var(--pinned-color); }
-.note-actions .archive-btn { color: var(--secondary-color); }
-.note-actions .unarchive-btn { color: var(--success-color); font-size: 1.2em; }
-.note-actions .restore-btn { color: var(--success-color); font-size: 1.2em; }
-.note-actions .delete-permanent-btn { font-weight: bold; }
+.note-actions .unarchive-btn, .note-actions .restore-btn { color: var(--success-color); }
+.note-actions .delete-permanent-btn { font-weight: bold; font-size: 0.8em; }
+.note-actions .edit-btn { font-size: 0.9em; }
+.note-actions .delete-btn { font-size: 0.9em; }
+
 
 /* --- Note Edit Mode --- */
 .note input[type="text"].edit-title-input, .note textarea.edit-input, .note input[type="text"].edit-tags-input { display: block; width: calc(100% - 12px); margin-bottom: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; padding: 5px; cursor: text; position: relative; z-index: 2; font-family: inherit; }
+.note input[type="text"].edit-title-input {
+    font-weight: 600;
+    border-bottom: 1px solid var(--input-border-color);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.note textarea.edit-input { min-height: 80px; resize: vertical; line-height: 1.5; white-space: pre-wrap; margin-top: 0; }
+
 .note input:focus, .note textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
 .note input[type="text"].edit-title-input { font-weight: 600; }
 .note textarea.edit-input { min-height: 80px; resize: vertical; line-height: 1.5; white-space: pre-wrap; }
@@ -339,10 +867,11 @@ body.dark-mode #manage-templates-btn { background-color: #8a63d2; }
 
 /* --- Other Styles --- */
 .empty-state { grid-column: 1 / -1; text-align: center; color: var(--secondary-color); padding: 30px; font-style: italic; }
-#template-list-container .empty-state { padding: 15px; grid-column: auto; }
-.note.sortable-ghost { opacity: 0.4; background-color: var(--primary-color) !important; border: 1px dashed var(--primary-text-color); }
-.note.sortable-chosen { opacity: 0.9; box-shadow: 0 5px 15px var(--shadow-color); transform: scale(1.02); cursor: grabbing; }
-.note.sortable-drag { opacity: 0.9; cursor: grabbing; }
+#template-list-container .empty-state,
+#notebook-list-container .empty-state { padding: 15px; grid-column: auto; }
+.note.sortable-ghost { opacity: 0.4; background-color: var(--primary-color) !important; border: 1px dashed var(--primary-text-color); transform: translateY(0); }
+.note.sortable-chosen { opacity: 0.9; box-shadow: 0 5px 15px var(--shadow-color); transform: scale(1.02) translateY(-3px); cursor: grabbing; }
+.note.sortable-drag { opacity: 0.9; cursor: grabbing; transform: scale(1.02) translateY(-3px); }
 .fab { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; background-color: var(--fab-bg-color); color: var(--fab-text-color); border: none; border-radius: 50%; font-size: 28px; line-height: 55px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1000; transition: transform 0.2s ease-in-out, background-color 0.3s, visibility 0s linear 0.1s, opacity 0.1s linear; }
 .fab:hover { transform: scale(1.1); }
 .fab.hidden { visibility: hidden; opacity: 0; transform: scale(0.5); transition-delay: 0s; }
@@ -389,6 +918,49 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 #template-edit-panel textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
 #template-edit-panel .panel-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
 
+/* === Notebook Modal Styles === */
+.notebook-modal-content { max-width: 550px; }
+#notebook-list-section { margin-bottom: 20px; }
+#notebook-list-section h3, #notebook-edit-panel h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em; color: var(--primary-color); }
+#notebook-list-container { margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 5px; }
+.notebook-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--border-color); }
+.notebook-list-item:last-child { border-bottom: none; }
+.notebook-list-item span { font-weight: 500; margin-right: 10px; word-break: break-word; }
+.notebook-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+#notebook-edit-panel { padding: 15px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--setting-section-bg); }
+#notebook-edit-panel .form-group { margin-bottom: 12px; }
+#notebook-edit-panel label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 0.9em; color: var(--secondary-color); }
+#notebook-edit-panel input[type="text"] { width: calc(100% - 22px); padding: 8px 10px; border: 1px solid var(--input-border-color); border-radius: 4px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; font-family: inherit; }
+#notebook-edit-panel input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
+#notebook-edit-panel .panel-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+
+/* === Quick Note Modal Styles === */
+.quick-note-modal-content { max-width: 500px; } /* Nhỏ hơn modal khác */
+#quick-note-text {
+    display: block;
+    width: calc(100% - 22px); /* Giống các textarea khác */
+    padding: 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 1em;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px; /* Cao hơn chút */
+    margin-bottom: 15px; /* Khoảng cách với nút */
+}
+#quick-note-text:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25);
+}
+#quick-note-modal .panel-actions {
+    justify-content: flex-end; /* Chỉ cần nút lưu */
+}
+
+
 /* Generic Modal Button Styles */
 .modal-button { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.95em; transition: background-color 0.2s, opacity 0.2s, border-color 0.2s, color 0.2s; border: 1px solid transparent; background-color: transparent; line-height: 1.4; }
 .modal-button.primary { background-color: var(--primary-color); color: var(--primary-text-color); border-color: var(--primary-color); }
@@ -398,26 +970,28 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 .modal-button.danger { background-color: transparent; color: var(--danger-color); border-color: var(--danger-color); }
 .modal-button.danger:hover { background-color: var(--danger-color); color: var(--primary-text-color); opacity: 0.9; }
 .modal-button.small-button { padding: 5px 10px !important; font-size: 0.85em !important; }
-#show-add-template-panel-btn { background-color: var(--success-color); color: var(--primary-text-color); border: none; margin-top: 10px; }
-#show-add-template-panel-btn:hover { opacity: 0.9; }
+#show-add-template-panel-btn,
+#show-add-notebook-panel-btn { background-color: var(--success-color); color: var(--primary-text-color); border: none; margin-top: 10px; }
+#show-add-template-panel-btn:hover,
+#show-add-notebook-panel-btn:hover { opacity: 0.9; }
 
 /* === CSS CHO MODAL CÀI ĐẶT === */
 .settings-modal-content { max-width: 650px; }
 .setting-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
 .setting-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 .setting-section h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em; color: var(--primary-color); }
-.setting-options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; } /* Tăng minmax */
+.setting-options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
 .setting-option-button { padding: 10px 15px; border: 1px solid var(--setting-option-border); border-radius: 5px; background-color: var(--card-bg-color); color: var(--text-color); cursor: pointer; text-align: center; font-size: 0.95em; transition: background-color 0.2s, border-color 0.2s, color 0.2s; }
 .setting-option-button:hover { background-color: var(--setting-option-hover-bg); }
 .setting-option-button.active { background-color: var(--setting-option-active-bg); color: var(--setting-option-active-text); border-color: var(--setting-option-active-border); font-weight: bold; }
 .accent-color-options { display: flex; flex-wrap: wrap; gap: 10px; }
-/* Style cho .accent-swatch.selected đã dùng lại .selected từ color-swatch-btn */
 #font-family-select { width: 100%; padding: 8px 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 0.95em; cursor: pointer; }
 body.dark-mode #font-family-select option { background-color: var(--card-bg-color); color: var(--text-color); }
 .font-size-control { display: flex; align-items: center; gap: 15px; }
 #font-size-slider { flex-grow: 1; cursor: pointer; accent-color: var(--primary-color); }
 #font-size-value { min-width: 45px; text-align: right; font-weight: 500; color: var(--secondary-color); }
-#reset-font-size-btn {} /* Đã có class modal-button secondary small-button */
+#reset-font-size-btn {}
 
 /* Tiện ích ẩn accessibly */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
