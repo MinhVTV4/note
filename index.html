@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Notes - Archive & Trash Feature</title> <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+    <title>Start Notes - Archive & Trash Feature</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="style.css">
 
 </head>
@@ -14,20 +13,29 @@
     <header class="app-header">
         <h1>Ghi Chú Khởi Đầu</h1>
         <div class="header-actions">
-            <button id="view-archive-btn" title="Xem các ghi chú đã lưu trữ">Xem Lưu trữ</button>
-            <button id="view-trash-btn" title="Xem các ghi chú đã xóa">Thùng rác</button>  <button id="empty-trash-btn" class="hidden" title="Xóa vĩnh viễn tất cả ghi chú trong thùng rác">Dọn sạch Thùng rác</button> <button id="export-notes-btn" title="Xuất tất cả ghi chú ra file JSON">Xuất Notes</button>
+            <button id="manage-templates-btn" title="Quản lý các mẫu ghi chú">Quản lý Mẫu</button> <button id="view-archive-btn" title="Xem các ghi chú đã lưu trữ">Xem Lưu trữ</button>
+            <button id="view-trash-btn" title="Xem các ghi chú đã xóa">Thùng rác</button>
+            <button id="empty-trash-btn" class="hidden" title="Xóa vĩnh viễn tất cả ghi chú trong thùng rác">Dọn sạch Thùng rác</button>
+            <button id="export-notes-btn" title="Xuất tất cả ghi chú ra file JSON">Xuất Notes</button>
             <button id="import-notes-btn" title="Nhập ghi chú từ file JSON (Sẽ thay thế toàn bộ ghi chú hiện tại)">Nhập Notes</button>
             <input type="file" id="import-file-input" accept=".json" class="hidden">
             <button id="theme-toggle-btn">Chuyển Giao Diện</button>
         </div>
          <div id="archive-status-indicator" class="archive-status hidden">Đang xem các ghi chú đã lưu trữ.</div>
-         <div id="trash-status-indicator" class="archive-status hidden">Đang xem Thùng rác.</div> </header>
+         <div id="trash-status-indicator" class="archive-status hidden">Đang xem Thùng rác.</div>
+     </header>
 
     <div class="controls-container">
         <input type="search" id="search-input" placeholder="Tìm kiếm ghi chú (tiêu đề, nội dung hoặc #tag)...">
         <div id="add-note-panel" class="hidden">
-            <input type="text" id="new-note-title" placeholder="Tiêu đề (tùy chọn)...">
-            <textarea id="new-note-text" placeholder="Nhập nội dung ghi chú (hỗ trợ Markdown, dùng - [ ] hoặc - [x] cho checklist)..."></textarea>
+             <div class="form-group">
+                <label for="template-select">Sử dụng mẫu:</label>
+                <select id="template-select">
+                    <option value="">-- Không dùng mẫu --</option>
+                    </select>
+            </div>
+             <input type="text" id="new-note-title" placeholder="Tiêu đề (tùy chọn)...">
+            <textarea id="new-note-text" placeholder="Nhập nội dung ghi chú..."></textarea>
             <input type="text" id="new-note-tags" placeholder="Tags (cách nhau bằng dấu phẩy)..." autocomplete="off">
             <div class="panel-actions">
                  <button id="add-note-btn">Thêm Ghi Chú</button>
@@ -39,8 +47,50 @@
     <div id="notes-container">
         </div>
 
-    <button id="show-add-panel-btn" class="fab">+</button>
+    <button id="show-add-panel-btn" class="fab" title="Thêm ghi chú mới">+</button>
 
+    <div id="template-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="template-modal-title">
+        <div class="modal-content template-modal-content">
+            <div class="modal-header">
+                <h2 id="template-modal-title">Quản lý Mẫu Ghi Chú</h2>
+                <button id="close-template-modal-btn" class="close-modal-btn" title="Đóng (Esc)" aria-label="Đóng cửa sổ quản lý mẫu">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="template-list-section">
+                    <h3>Danh sách Mẫu</h3>
+                    <div id="template-list-container">
+                        <p class="empty-state">Chưa có mẫu nào.</p>
+                    </div>
+                    <button id="show-add-template-panel-btn" class="modal-button">Tạo Mẫu Mới</button>
+                </div>
+
+                <div id="template-edit-panel" class="hidden">
+                    <h3 id="template-edit-title">Tạo Mẫu Mới</h3>
+                    <input type="hidden" id="template-edit-id">
+                    <div class="form-group">
+                        <label for="template-edit-name">Tên Mẫu (bắt buộc):</label>
+                        <input type="text" id="template-edit-name" placeholder="Ví dụ: Họp hàng tuần, Ý tưởng Blog...">
+                    </div>
+                    <div class="form-group">
+                        <label for="template-edit-title">Tiêu đề Mẫu:</label>
+                        <input type="text" id="template-edit-title-input" placeholder="Tiêu đề mặc định...">
+                    </div>
+                    <div class="form-group">
+                        <label for="template-edit-text">Nội dung Mẫu:</label>
+                        <textarea id="template-edit-text" placeholder="Nội dung mặc định..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="template-edit-tags">Tags Mẫu:</label>
+                        <input type="text" id="template-edit-tags" placeholder="Tags mặc định (cách nhau bằng dấu phẩy)...">
+                    </div>
+                    <div class="panel-actions">
+                        <button id="save-template-btn" class="modal-button primary">Lưu Mẫu</button>
+                        <button id="cancel-edit-template-btn" class="modal-button secondary">Hủy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="script.js" defer></script>
 
 </body>
