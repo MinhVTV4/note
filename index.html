@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Notes - Archive & Trash Feature</title>
+    <title>Start Notes - Notebook Tabs Feature</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,32 +14,40 @@
 <body>
 
     <header class="app-header">
-        <h1>Ghi Chú Khởi Đầu</h1>
+        <div class="title-container">
+            <h1>Ghi Chú Khởi Đầu</h1>
+            <button id="quick-note-btn" class="quick-note-button" title="Ghi chú nhanh (Ctrl+Q)">⚡️</button> </div>
         <div class="header-actions">
+            <button id="manage-notebooks-btn" title="Quản lý các sổ tay">Quản lý Sổ tay</button>
             <button id="manage-templates-btn" title="Quản lý các mẫu ghi chú">Quản lý Mẫu</button>
             <button id="view-archive-btn" title="Xem các ghi chú đã lưu trữ">Xem Lưu trữ</button>
             <button id="view-trash-btn" title="Xem các ghi chú đã xóa">Thùng rác</button>
             <button id="empty-trash-btn" class="hidden" title="Xóa vĩnh viễn tất cả ghi chú trong thùng rác">Dọn sạch Thùng rác</button>
-            <button id="export-notes-btn" title="Xuất tất cả ghi chú và mẫu ra file JSON">Xuất Notes</button>
-            <button id="import-notes-btn" title="Nhập ghi chú và mẫu từ file JSON (Sẽ thay thế toàn bộ dữ liệu hiện tại)">Nhập Notes</button>
+            <button id="export-notes-btn" title="Xuất tất cả ghi chú, mẫu và sổ tay ra file JSON">Xuất Notes</button>
+            <button id="import-notes-btn" title="Nhập ghi chú, mẫu và sổ tay từ file JSON (Sẽ thay thế toàn bộ dữ liệu hiện tại)">Nhập Notes</button>
             <input type="file" id="import-file-input" accept=".json" class="hidden">
             <button id="settings-btn" title="Mở cài đặt giao diện">Cài đặt</button>
             <button id="theme-toggle-btn" title=""></button>
-
         </div>
          <div id="archive-status-indicator" class="archive-status hidden">Đang xem các ghi chú đã lưu trữ.</div>
          <div id="trash-status-indicator" class="archive-status hidden">Đang xem Thùng rác.</div>
-     </header>
+      </header>
+
+    <div id="notebook-tabs-container" class="notebook-tabs">
+        <button class="tab-button active" data-notebook-id="all">Tất cả Ghi chú</button>
+        <button id="add-notebook-tab-btn" class="add-tab-button" title="Thêm Sổ tay mới">+</button>
+    </div>
+
 
     <div class="controls-container">
         <input type="search" id="search-input" placeholder="Tìm kiếm ghi chú (tiêu đề, nội dung hoặc #tag)...">
         <div id="add-note-panel" class="hidden">
              <div class="form-group">
-                <label for="template-select">Sử dụng mẫu:</label>
-                <select id="template-select">
-                    <option value="">-- Không dùng mẫu --</option>
-                    </select>
-            </div>
+                 <label for="template-select">Sử dụng mẫu:</label>
+                 <select id="template-select">
+                     <option value="">-- Không dùng mẫu --</option>
+                     </select>
+             </div>
              <input type="text" id="new-note-title" placeholder="Tiêu đề (tùy chọn)...">
             <textarea id="new-note-text" placeholder="Nhập nội dung ghi chú..."></textarea>
             <input type="text" id="new-note-tags" placeholder="Tags (cách nhau bằng dấu phẩy)..." autocomplete="off">
@@ -54,6 +62,51 @@
         </div>
 
     <button id="show-add-panel-btn" class="fab" title="Thêm ghi chú mới">+</button>
+
+    <div id="quick-note-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="quick-note-modal-title">
+        <div class="modal-content quick-note-modal-content">
+            <div class="modal-header">
+                <h2 id="quick-note-modal-title">Ghi chú nhanh</h2>
+                <button id="close-quick-note-modal-btn" class="close-modal-btn" title="Đóng (Esc)" aria-label="Đóng cửa sổ ghi chú nhanh">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="quick-note-text" placeholder="Nhập nội dung ghi chú nhanh..." rows="8"></textarea>
+                <div class="panel-actions">
+                    <button id="save-quick-note-btn" class="modal-button primary">Lưu nhanh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="notebook-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="notebook-modal-title">
+        <div class="modal-content notebook-modal-content">
+            <div class="modal-header">
+                <h2 id="notebook-modal-title">Quản lý Sổ tay</h2>
+                <button id="close-notebook-modal-btn" class="close-modal-btn" title="Đóng (Esc)" aria-label="Đóng cửa sổ quản lý sổ tay">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="notebook-list-section">
+                    <h3>Danh sách Sổ tay</h3>
+                    <div id="notebook-list-container">
+                        <p class="empty-state">Chưa có sổ tay nào.</p>
+                    </div>
+                    <button id="show-add-notebook-panel-btn" class="modal-button primary">Tạo Sổ tay Mới</button>
+                </div>
+
+                <div id="notebook-edit-panel" class="hidden">
+                    <h3 id="notebook-edit-title">Tạo Sổ tay Mới</h3>
+                    <input type="hidden" id="notebook-edit-id">
+                    <div class="form-group">
+                        <label for="notebook-edit-name">Tên Sổ tay (bắt buộc):</label>
+                        <input type="text" id="notebook-edit-name" placeholder="Ví dụ: Công việc, Cá nhân...">
+                    </div>
+                    <div class="panel-actions">
+                        <button id="save-notebook-btn" class="modal-button primary">Lưu Sổ tay</button>
+                        <button id="cancel-edit-notebook-btn" class="modal-button secondary">Hủy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="template-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="template-modal-title">
         <div class="modal-content template-modal-content">
@@ -115,6 +168,11 @@
                         <button class="theme-option-btn setting-option-button" data-theme="sepia" role="radio" aria-checked="false">Nâu đỏ</button>
                         <button class="theme-option-btn setting-option-button" data-theme="solarized-light" role="radio" aria-checked="false">Solarized Sáng</button>
                         <button class="theme-option-btn setting-option-button" data-theme="solarized-dark" role="radio" aria-checked="false">Solarized Tối</button>
+                        <button class="theme-option-btn setting-option-button" data-theme="nord" role="radio" aria-checked="false">Nord</button>
+                        <button class="theme-option-btn setting-option-button" data-theme="gruvbox-dark" role="radio" aria-checked="false">Gruvbox Tối</button>
+                        <button class="theme-option-btn setting-option-button" data-theme="gruvbox-light" role="radio" aria-checked="false">Gruvbox Sáng</button>
+                        <button class="theme-option-btn setting-option-button" data-theme="dracula" role="radio" aria-checked="false">Dracula</button>
+                        <button class="theme-option-btn setting-option-button" data-theme="monochrome" role="radio" aria-checked="false">Monochrome</button>
                          </div>
                 </div>
 
@@ -122,12 +180,16 @@
                     <h3>Màu nhấn (Accent Color)</h3>
                      <div class="accent-color-options" role="radiogroup" aria-labelledby="accent-color-label">
                          <span id="accent-color-label" class="sr-only">Chọn màu nhấn</span>
-                         <button class="color-swatch-btn accent-swatch" data-color="default" title="Mặc định" role="radio" aria-checked="true" style="background-color: #ccc; border: 1px dashed;"></button> <button class="color-swatch-btn accent-swatch" data-color="#dc3545" title="Đỏ" style="background-color: #dc3545;" role="radio" aria-checked="false"></button>
+                         <button class="color-swatch-btn accent-swatch" data-color="default" title="Mặc định" role="radio" aria-checked="true" style="background-color: #ccc; border: 1px dashed;"></button>
+                         <button class="color-swatch-btn accent-swatch" data-color="#dc3545" title="Đỏ" style="background-color: #dc3545;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#ffc107" title="Vàng" style="background-color: #ffc107;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#198754" title="Xanh lá" style="background-color: #198754;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#6f42c1" title="Tím" style="background-color: #6f42c1;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#fd7e14" title="Cam" style="background-color: #fd7e14;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#20c997" title="Xanh ngọc" style="background-color: #20c997;" role="radio" aria-checked="false"></button>
+                         <button class="color-swatch-btn accent-swatch" data-color="#d63384" title="Hồng" style="background-color: #d63384;" role="radio" aria-checked="false"></button>
+                         <button class="color-swatch-btn accent-swatch" data-color="#6610f2" title="Chàm (Indigo)" style="background-color: #6610f2;" role="radio" aria-checked="false"></button>
+                         <button class="color-swatch-btn accent-swatch" data-color="#a0522d" title="Nâu (Sienna)" style="background-color: #a0522d;" role="radio" aria-checked="false"></button>
                          </div>
                  </div>
 
@@ -158,7 +220,9 @@
                      </div>
                  </div>
 
-                 </div> </div> </div> <script src="script.js" defer></script>
+                 </div> </div> </div>
+
+    <script src="script.js" defer></script>
 
 </body>
 </html>
