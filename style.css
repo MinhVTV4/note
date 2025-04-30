@@ -27,7 +27,7 @@
     --modal-content-bg: #ffffff;
     --modal-border-color: #ccc;
 
-    /* NEW: Note Color Variables (Light Mode) */
+    /* Note Color Variables (Light Mode) */
     --note-color-yellow-bg: #fff9e0;
     --note-color-yellow-border: #ffecb3;
     --note-color-blue-bg: #e7f3ff;
@@ -61,24 +61,24 @@ body.dark-mode {
      --highlight-bg-color: #664d03;
      --highlight-text-color: #fff3cd;
      --archive-color: var(--secondary-color);
-     --fade-color-start: rgba(52, 58, 64, 0); /* Use card bg color */
+     --fade-color-start: rgba(52, 58, 64, 0);
      --fade-color-end: rgba(52, 58, 64, 1);
      --modal-backdrop-color: rgba(0, 0, 0, 0.7);
      --modal-content-bg: #343a40;
      --modal-border-color: #495057;
 
-    /* NEW: Note Color Variables (Dark Mode) */
+    /* Note Color Variables (Dark Mode) */
     --note-color-yellow-bg: #4d4222;
     --note-color-yellow-border: #806b38;
     --note-color-blue-bg: #2c3e50;
     --note-color-blue-border: #34495e;
     --note-color-green-bg: #2e4b30;
-    --note-color-green-border: #38761d; /* Adjusted for visibility */
+    --note-color-green-border: #38761d;
     --note-color-red-bg: #5c2b2e;
     --note-color-red-border: #74383b;
-    --note-color-grey-bg: #424242;  /* Darker grey */
+    --note-color-grey-bg: #424242;
     --note-color-grey-border: #616161;
-    --note-color-purple-bg: #4a148c; /* Darker purple */
+    --note-color-purple-bg: #4a148c;
     --note-color-purple-border: #6a1b9a;
 }
 
@@ -132,6 +132,17 @@ body {
 #import-notes-btn { background-color: var(--primary-color); }
 #view-archive-btn { background-color: var(--secondary-color); }
 #view-archive-btn.viewing-archive { background-color: var(--primary-color); }
+#view-trash-btn { background-color: var(--secondary-color); }
+body.dark-mode #view-trash-btn { background-color: var(--secondary-color); }
+#view-trash-btn.viewing-trash { background-color: var(--danger-color); color: var(--primary-text-color); }
+body.dark-mode #view-trash-btn.viewing-trash { background-color: var(--danger-color); }
+#empty-trash-btn { background-color: var(--danger-color); color: var(--primary-text-color); }
+#empty-trash-btn:hover { opacity: 0.9; }
+#empty-trash-btn.hidden { display: none !important; }
+#manage-templates-btn { background-color: #6f42c1; } /* Example purple color for template button */
+body.dark-mode #manage-templates-btn { background-color: #8a63d2; }
+
+
 .archive-status {
     width: 100%;
     text-align: center;
@@ -166,15 +177,15 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     box-shadow: 0 3px 8px var(--shadow-color);
-    position: relative; /* Needed if adding absolute elements */
+    position: relative;
 }
 .hidden { display: none !important; }
 #add-note-panel textarea,
 #add-note-panel input[type="text"] {
     display: block;
-    width: calc(100% - 22px); /* Account for padding */
+    width: calc(100% - 22px);
     padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Spacing for title/text/tags inputs */
     border: 1px solid var(--input-border-color);
     border-radius: 5px;
     background-color: var(--input-bg-color);
@@ -189,7 +200,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
+    margin-top: 15px; /* Increased top margin for actions */
 }
 #add-note-panel #add-note-btn {
     padding: 10px 20px;
@@ -227,13 +238,13 @@ body {
     box-shadow: 0 2px 5px var(--shadow-color);
     display: flex;
     flex-direction: column;
-    transition: box-shadow 0.2s, background-color 0.3s, border-color 0.3s, border-left-color 0.3s; /* Added border-left-color */
+    transition: box-shadow 0.2s, background-color 0.3s, border-color 0.3s, border-left-color 0.3s;
     cursor: grab;
     user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
     position: relative;
-    overflow: visible; /* Allow absolute positioned elements */
-    min-height: 150px; /* Optional minimum height */
-    border-left: 5px solid transparent; /* Default transparent thicker border */
+    overflow: visible;
+    min-height: 150px;
+    border-left: 5px solid transparent;
 }
 .note:active { cursor: grabbing; }
 .note:hover { box-shadow: 0 4px 10px var(--shadow-color); }
@@ -250,18 +261,13 @@ body {
     z-index: 0;
 }
 
-/* --- NEW: Note Color Classes --- */
+/* --- Note Color Classes --- */
 .note.note-color-yellow { background-color: var(--note-color-yellow-bg); border-left-color: var(--note-color-yellow-border); border-color: var(--note-color-yellow-border); }
 .note.note-color-blue { background-color: var(--note-color-blue-bg); border-left-color: var(--note-color-blue-border); border-color: var(--note-color-blue-border); }
 .note.note-color-green { background-color: var(--note-color-green-bg); border-left-color: var(--note-color-green-border); border-color: var(--note-color-green-border); }
 .note.note-color-red { background-color: var(--note-color-red-bg); border-left-color: var(--note-color-red-border); border-color: var(--note-color-red-border); }
 .note.note-color-grey { background-color: var(--note-color-grey-bg); border-left-color: var(--note-color-grey-border); border-color: var(--note-color-grey-border); }
 .note.note-color-purple { background-color: var(--note-color-purple-bg); border-left-color: var(--note-color-purple-border); border-color: var(--note-color-purple-border); }
-
-/* Adjust text color for specific backgrounds if needed (Example) */
-/* .note.note-color-purple { color: #fff; } */
-/* body.dark-mode .note.note-color-yellow { color: #000; } */
-
 
 .note-title {
     font-size: 1.15em;
@@ -277,12 +283,13 @@ body.dark-mode .note-title { color: #9ecbff; }
 .note-content {
     flex-grow: 1;
     margin-bottom: 10px;
-    word-wrap: break-word;
+    word-wrap: break-word; /* Wrap long words */
+    white-space: pre-wrap; /* Preserve line breaks and spaces */
     font-size: 1em;
-    position: relative; /* Needed for ::after */
+    position: relative;
     z-index: 1;
-    max-height: 200px; /* Limit height */
-    overflow: hidden; /* Hide overflow */
+    max-height: 200px;
+    overflow: hidden;
 }
 /* Fade-out effect for truncated content */
 .note-content.has-overflow::after {
@@ -291,10 +298,10 @@ body.dark-mode .note-title { color: #9ecbff; }
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 30px; /* Height of the fade */
+    height: 30px;
     background: linear-gradient(to top, var(--fade-color-end), var(--fade-color-start));
-    pointer-events: none; /* Allow clicking through the fade */
-    z-index: 2; /* Above potential content below */
+    pointer-events: none;
+    z-index: 2;
 }
 .read-more-btn {
     display: block;
@@ -307,8 +314,8 @@ body.dark-mode .note-title { color: #9ecbff; }
     border-radius: 4px;
     cursor: pointer;
     text-align: center;
-    z-index: 3; /* Above fade */
-    position: relative; /* Ensure it's clickable over fade */
+    z-index: 3;
+    position: relative;
 }
 .read-more-btn:hover {
      text-decoration: underline;
@@ -321,21 +328,12 @@ body.dark-mode .read-more-btn:hover {
     border-color: var(--border-color);
 }
 
-
-/* Markdown styles */
-.note-content h1, .note-content h2, .note-content h3 { margin-top: 0.5em; margin-bottom: 0.3em; line-height: 1.3; }
-.note-content p { margin-top: 0; margin-bottom: 0.5em; }
+/* Basic styles for content, Markdown specific styles removed */
+.note-content p { margin-top: 0; margin-bottom: 0.5em; } /* Might still be useful if text naturally wraps */
 .note-content ul, .note-content ol { margin-top: 0; margin-bottom: 0.5em; padding-left: 20px; }
 .note-content li { margin-bottom: 0.2em; }
-.note-content code { background-color: rgba(100, 100, 100, 0.1); padding: 0.1em 0.3em; border-radius: 3px; font-family: monospace; }
-.note-content pre { background-color: rgba(100, 100, 100, 0.1); padding: 0.5em; border-radius: 3px; overflow-x: auto; }
-.note-content pre code { background-color: transparent; padding: 0; }
-.note-content blockquote { border-left: 3px solid var(--secondary-color); margin-left: 0; padding-left: 1em; color: var(--secondary-color); }
-.note-content a { color: var(--primary-color); text-decoration: none; }
-.note-content a:hover { text-decoration: underline; }
-.note-content ul li.task-list-item { list-style-type: none; margin-left: -1.2em; }
-.note-content ul li.task-list-item input[type="checkbox"].task-list-item-checkbox { margin-right: 0.5em; cursor: pointer; vertical-align: middle; }
-.note-content ul li.task-list-item:has(> input[type="checkbox"].task-list-item-checkbox:checked) { color: var(--secondary-color); text-decoration: line-through; }
+/* Removed: h1-h3, code, pre, blockquote, task-list-item styles */
+
 
 .note-timestamp {
     font-size: 0.8em;
@@ -376,7 +374,7 @@ body.dark-mode .read-more-btn:hover {
     gap: 8px;
     border-top: 1px solid var(--border-color);
     padding-top: 10px;
-    margin-top: auto; /* Pushes actions down */
+    margin-top: auto;
     position: relative;
     z-index: 1;
 }
@@ -391,26 +389,32 @@ body.dark-mode .read-more-btn:hover {
     color: var(--secondary-color);
 }
 .note-actions button:hover { opacity: 0.7; }
-.edit-btn { color: var(--primary-color); }
-body.dark-mode .edit-btn { color: #58a6ff; }
-.delete-btn { color: var(--danger-color); }
-.pin-btn {
-    color: var(--pin-color);
-    font-size: 1.1em;
-    padding: 5px;
-    line-height: 1;
-}
-.pin-btn.pinned { color: var(--pinned-color); }
-.pin-btn:hover { opacity: 0.7; }
-.archive-btn, .unarchive-btn { color: var(--archive-color); }
-.unarchive-btn { color: var(--success-color); }
+.note-actions .edit-btn { color: var(--primary-color); }
+body.dark-mode .note-actions .edit-btn { color: #58a6ff; }
+.note-actions .delete-btn { color: var(--danger-color); }
+body.dark-mode .note-actions .delete-btn { color: var(--danger-color); }
+.note-actions .pin-btn { color: var(--pin-color); font-size: 1.1em; padding: 5px; line-height: 1; }
+.note-actions .pin-btn.pinned { color: var(--pinned-color); }
+.note-actions .pin-btn:hover { opacity: 0.7; }
+.note-actions .archive-btn { color: var(--secondary-color); }
+body.dark-mode .note-actions .archive-btn { color: var(--secondary-color); }
+.note-actions .unarchive-btn { color: var(--success-color); font-size: 1.2em; padding: 5px; line-height: 1; }
+body.dark-mode .note-actions .unarchive-btn { color: var(--success-color); }
+.note-actions .unarchive-btn:hover { opacity: 0.7; }
+.note-actions .restore-btn { color: var(--success-color); font-size: 1.2em; padding: 5px; line-height: 1; }
+body.dark-mode .note-actions .restore-btn { color: var(--success-color); }
+.note-actions .restore-btn:hover { opacity: 0.7; }
+.note-actions .delete-permanent-btn { color: var(--danger-color); font-weight: bold; }
+body.dark-mode .note-actions .delete-permanent-btn { color: var(--danger-color); }
+.note-actions .delete-permanent-btn:hover { opacity: 0.7; }
+
 
 /* Note Edit Mode */
 .note input[type="text"].edit-title-input,
 .note textarea.edit-input,
 .note input[type="text"].edit-tags-input {
     display: block;
-    width: calc(100% - 12px); /* Account for padding */
+    width: calc(100% - 12px);
     margin-bottom: 10px;
     border: 1px solid var(--input-border-color);
     border-radius: 5px;
@@ -419,39 +423,40 @@ body.dark-mode .edit-btn { color: #58a6ff; }
     font-size: 1em;
     padding: 5px;
     cursor: text;
-    position: relative; /* Ensure it's above background */
+    position: relative;
 }
 .note input[type="text"].edit-title-input { font-weight: bold; }
 .note textarea.edit-input {
     min-height: 60px;
     resize: vertical;
-    font-family: inherit; /* Use body font or specify */
+    font-family: inherit;
+    white-space: pre-wrap; /* Ensure line breaks are respected in edit mode too */
 }
 .save-edit-btn {
-    background-color: var(--primary-color) !important; /* Override default */
+    background-color: var(--primary-color) !important;
     color: var(--primary-text-color) !important;
     padding: 5px 10px !important;
 }
 
-/* --- NEW: Color Selector Styles --- */
+/* --- Color Selector Styles --- */
 .color-selector-container {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 5px; /* Space above */
-    margin-bottom: 10px; /* Space below */
+    margin-top: 8px;
+    margin-bottom: 12px;
     padding: 5px 0;
-    position: relative; /* Ensure it's above background */
+    position: relative;
     z-index: 1;
 }
 .color-swatch-btn {
     width: 24px;
     height: 24px;
-    border-radius: 50%; /* Circle */
+    border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
     padding: 0;
-    font-size: 0; /* Hide text if any */
+    font-size: 0;
     transition: transform 0.1s ease-out, border-color 0.2s;
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
@@ -459,16 +464,16 @@ body.dark-mode .edit-btn { color: #58a6ff; }
     transform: scale(1.1);
 }
 .color-swatch-btn.selected {
-    border-color: var(--primary-color); /* Highlight selected */
+    border-color: var(--primary-color);
     transform: scale(1.15);
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 .color-swatch-btn.default-color-swatch {
     background-color: var(--card-bg-color);
-    border: 1px dashed var(--secondary-color); /* Dashed border for default */
+    border: 1px dashed var(--secondary-color);
     color: var(--secondary-color);
     font-size: 14px;
-    line-height: 20px; /* Adjust to center */
+    line-height: 20px;
     text-align: center;
      box-shadow: none;
 }
@@ -476,22 +481,27 @@ body.dark-mode .edit-btn { color: #58a6ff; }
     border-style: solid;
 }
 .color-swatch-btn.default-color-swatch.selected {
-     border: 2px solid var(--primary-color) !important; /* Ensure override */
+     border: 2px solid var(--primary-color) !important;
      box-shadow: none;
 }
 
 
 /* --- Other Styles --- */
 .empty-state {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1; /* Span across grid columns if notes container is empty */
     text-align: center;
     color: var(--secondary-color);
     padding: 30px;
     font-style: italic;
 }
+#template-list-container .empty-state { /* Specific style for empty state within template list */
+    padding: 15px;
+    grid-column: auto; /* Reset grid span */
+}
+
 .note.sortable-ghost {
     opacity: 0.4;
-    background-color: #d3eaff; /* Needs dark mode variant? */
+    background-color: #d3eaff;
 }
 body.dark-mode .note.sortable-ghost { background-color: #03213e; }
 
@@ -538,9 +548,9 @@ body.dark-mode .note.sortable-ghost { background-color: #03213e; }
     max-height: 150px;
     overflow-y: auto;
     z-index: 1001;
-    width: auto; /* Adjust width based on content or input */
+    width: auto;
     min-width: 150px;
-    margin-top: 2px; /* Small gap from input */
+    margin-top: 2px;
 }
 .suggestion-item {
     padding: 8px 10px;
@@ -561,14 +571,15 @@ mark {
 }
 
 /* --- Modal Styles --- */
-.note-modal {
+/* Generic modal styles */
+.modal {
     position: fixed;
     z-index: 2000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Enable scroll if needed */
+    overflow: hidden; /* Prevent body scroll when modal is open */
     background-color: var(--modal-backdrop-color);
     display: flex;
     align-items: center;
@@ -577,40 +588,36 @@ mark {
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
-.note-modal.visible {
+.modal.visible {
     opacity: 1;
     visibility: visible;
     transition: opacity 0.3s ease, visibility 0s linear 0s;
+    overflow-y: auto; /* Allow modal scrolling if content exceeds viewport */
 }
+.modal:not(.hidden) {
+    display: flex;
+}
+/* Base Modal Content Style */
 .modal-content {
     background-color: var(--modal-content-bg);
     color: var(--text-color);
     margin: auto;
-    padding: 20px;
+    padding: 20px 25px; /* Adjust padding */
     border: 1px solid var(--modal-border-color);
     border-radius: 8px;
-    width: 80%;
-    max-width: 700px;
-    max-height: 85vh;
-    overflow-y: auto; /* Scroll within modal */
+    width: 90%; /* Relative width */
+    max-height: 85vh; /* Limit height */
+    overflow-y: auto; /* Allow content scroll */
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     position: relative;
+     display: flex; /* Use flex for header/body structure */
+     flex-direction: column;
 }
-/* Apply markdown styles within modal */
-.modal-content h1, .modal-content h2, .modal-content h3 { margin-top: 0.5em; margin-bottom: 0.3em; line-height: 1.3; color: var(--primary-color); }
-body.dark-mode .modal-content h1, body.dark-mode .modal-content h2, body.dark-mode .modal-content h3 { color: #9ecbff; }
-.modal-content p { margin-top: 0; margin-bottom: 0.5em; }
-.modal-content ul, .modal-content ol { margin-top: 0; margin-bottom: 0.5em; padding-left: 20px; }
-.modal-content li { margin-bottom: 0.2em; }
-.modal-content code { background-color: rgba(100, 100, 100, 0.1); padding: 0.1em 0.3em; border-radius: 3px; font-family: monospace; }
-.modal-content pre { background-color: rgba(100, 100, 100, 0.1); padding: 0.5em; border-radius: 3px; overflow-x: auto; }
-.modal-content pre code { background-color: transparent; padding: 0; }
-.modal-content blockquote { border-left: 3px solid var(--secondary-color); margin-left: 0; padding-left: 1em; color: var(--secondary-color); }
-.modal-content a { color: var(--primary-color); text-decoration: none; }
-.modal-content a:hover { text-decoration: underline; }
-.modal-content ul li.task-list-item { list-style-type: none; margin-left: -1.2em; }
-.modal-content ul li.task-list-item input[type="checkbox"] { margin-right: 0.5em; }
-.modal-content ul li.task-list-item:has(> input[type="checkbox"]:checked) { color: var(--secondary-color); text-decoration: line-through; }
+
+/* Note Modal Specific Content Style */
+.note-modal .modal-content {
+    max-width: 700px; /* Max width for note modal */
+}
 
 .modal-header {
     display: flex;
@@ -619,6 +626,7 @@ body.dark-mode .modal-content h1, body.dark-mode .modal-content h2, body.dark-mo
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     margin-bottom: 15px;
+    flex-shrink: 0; /* Prevent header shrinking */
 }
 .modal-header h2 {
     margin: 0;
@@ -626,8 +634,20 @@ body.dark-mode .modal-content h1, body.dark-mode .modal-content h2, body.dark-mo
     color: var(--primary-color);
 }
 body.dark-mode .modal-header h2 { color: #9ecbff; }
-.modal-body { line-height: 1.6; }
+
+.modal-body {
+    line-height: 1.6;
+     flex-grow: 1; /* Take available space */
+     overflow-y: auto; /* Allow body scroll if needed */
+     padding-top: 5px; /* Add slight padding at the top of the body */
+}
+.note-modal .modal-body { /* Specific for note modal */
+     white-space: pre-wrap; /* Preserve line breaks for note content */
+}
+
 .close-modal-btn {
+    background: none;
+    border: none;
     color: var(--secondary-color);
     font-size: 28px;
     font-weight: bold;
@@ -640,132 +660,189 @@ body.dark-mode .modal-header h2 { color: #9ecbff; }
     color: var(--text-color);
     text-decoration: none;
 }
-/* --- Trash Feature Styles --- */
-#view-trash-btn {
-    /* Keep default secondary color or choose another */
-    background-color: var(--secondary-color);
-}
-
-body.dark-mode #view-trash-btn {
-     background-color: var(--secondary-color);
-}
-
-#view-trash-btn.viewing-trash {
-    background-color: var(--danger-color); /* Highlight red when active */
-    color: var(--primary-text-color);
-}
-body.dark-mode #view-trash-btn.viewing-trash {
-    background-color: var(--danger-color);
-}
-
-
-#empty-trash-btn {
-    background-color: var(--danger-color);
-    color: var(--primary-text-color);
-}
-#empty-trash-btn:hover {
-    opacity: 0.9;
-}
-/* Ensure hidden trash button is truly hidden */
-#empty-trash-btn.hidden {
-    display: none !important; /* Use important if needed */
-}
-
-
-/* Styles for buttons inside notes in trash view */
-.note-actions .restore-btn {
-    color: var(--success-color);
-    font-size: 1.2em; /* Make icon slightly larger */
-    padding: 5px;
-    line-height: 1;
-}
-.note-actions .restore-btn:hover {
-    opacity: 0.7;
-}
-
-.note-actions .delete-permanent-btn {
-    color: var(--danger-color);
-    font-weight: bold; /* Make text bold */
-}
-.note-actions .delete-permanent-btn:hover {
-    opacity: 0.7;
-}
-
-
-/* Ensure correct button colors in Dark Mode */
-body.dark-mode .note-actions .restore-btn {
-    color: var(--success-color); /* Success color usually works ok in dark mode */
-}
-body.dark-mode .note-actions .delete-permanent-btn {
-    color: var(--danger-color); /* Danger color usually works ok in dark mode */
-}
-
-/* Ensure archive/unarchive icons have consistent color source */
-.note-actions .archive-btn {
-    color: var(--secondary-color);
-}
-.note-actions .unarchive-btn {
-    color: var(--success-color); /* Match restore button color */
-    font-size: 1.2em; /* Match restore icon size */
-    padding: 5px;
-    line-height: 1;
-}
-.note-actions .unarchive-btn:hover {
-     opacity: 0.7;
-}
-body.dark-mode .note-actions .archive-btn {
-     color: var(--secondary-color);
-}
-body.dark-mode .note-actions .unarchive-btn {
-     color: var(--success-color);
-}
-
-
-/* Ensure edit button color is correct */
-.note-actions .edit-btn { color: var(--primary-color); }
-body.dark-mode .note-actions .edit-btn { color: #58a6ff; } /* Existing dark mode color */
-
-
-/* Update .delete-btn style to be consistent */
-.note-actions .delete-btn {
-    color: var(--danger-color); /* Change to danger color for consistency */
-}
-body.dark-mode .note-actions .delete-btn {
-    color: var(--danger-color); /* Ensure dark mode also uses danger */
-}
-
-/* Optional: Slightly dim notes in trash (uncomment if desired) */
-/*
-#notes-container .note:has(.delete-permanent-btn) {
-    opacity: 0.9;
-    transition: opacity 0.3s ease;
-}
-#notes-container .note:has(.delete-permanent-btn):hover {
-    opacity: 1;
-}
-*/
 
 /* --- Auto-save Visual Feedback --- */
 .note.note-autosaved {
     transition: box-shadow 0.2s ease-in-out;
-    box-shadow: 0 0 0 2px var(--success-color); /* Green outline feedback */
+    box-shadow: 0 0 0 2px var(--success-color);
 }
-/* Ensure dark mode also shows feedback */
 body.dark-mode .note.note-autosaved {
      box-shadow: 0 0 0 2px var(--success-color);
 }
 
-/* Ensure edit inputs are visually distinct */
-.note input[type="text"].edit-title-input,
-.note textarea.edit-input,
-.note input[type="text"].edit-tags-input {
-    background-color: var(--input-bg-color); /* Already defined, ensure it's applied */
-    border: 1px solid var(--input-border-color); /* Already defined */
+/* --- Formatting Toolbar Styles Removed --- */
+
+
+/* --- Template Selector in Add Panel --- */
+#add-note-panel .form-group {
+    margin-bottom: 10px;
+}
+#add-note-panel label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--secondary-color);
+}
+#add-note-panel select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 0.95em;
+    cursor: pointer;
+}
+/* Dark mode adjustments for select */
+body.dark-mode #add-note-panel select {
+   background-color: var(--input-bg-color);
+   color: var(--text-color);
+   border-color: var(--input-border-color);
+}
+body.dark-mode #add-note-panel select option {
+    background-color: var(--card-bg-color); /* Match dropdown background */
+    color: var(--text-color);
 }
 
-/* Slightly adjust spacing for color selector */
-.color-selector-container {
-    margin-top: 8px; /* Add a bit more space above */
-    margin-bottom: 12px; /* Add a bit more space below */
+
+/* --- Template Management Modal --- */
+.template-modal-content { /* Specific sizing for template modal */
+    max-width: 600px; /* Adjust as needed */
 }
+
+/* Re-use modal-header, modal-body, close-modal-btn styles */
+
+#template-list-section {
+    margin-bottom: 20px;
+}
+
+#template-list-section h3, #template-edit-panel h3 {
+     margin-top: 0;
+     margin-bottom: 15px;
+     font-size: 1.2em;
+     color: var(--primary-color);
+}
+body.dark-mode #template-list-section h3, body.dark-mode #template-edit-panel h3 { color: #9ecbff; }
+
+
+#template-list-container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    max-height: 250px; /* Limit height and allow scroll if many templates */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 10px;
+}
+/* #template-list-container .empty-state styling already defined */
+
+.template-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 5px;
+    border-bottom: 1px solid var(--border-color);
+}
+.template-list-item:last-child {
+    border-bottom: none;
+}
+.template-list-item span {
+    font-weight: 500;
+    margin-right: 10px; /* Add some space before buttons */
+    word-break: break-word; /* Allow long names to wrap */
+}
+.template-item-actions {
+    display: flex;
+    gap: 8px; /* Use gap for spacing */
+    flex-shrink: 0; /* Prevent buttons shrinking */
+}
+/* .template-item-actions button styling is now handled by .modal-button classes in JS/HTML */
+
+
+/* --- Template Edit Panel --- */
+#template-edit-panel {
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.03); /* Slightly different bg in light */
+}
+body.dark-mode #template-edit-panel {
+    background-color: rgba(255,255,255,0.05); /* Slightly different bg in dark */
+}
+
+#template-edit-panel .form-group {
+    margin-bottom: 8px; /* <<== THE FIX IS APPLIED HERE (Reduced further) */
+}
+#template-edit-panel label {
+    display: block;
+    margin-bottom: 4px; /* Slightly reduced margin below label */
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--secondary-color);
+}
+#template-edit-panel input[type="text"],
+#template-edit-panel textarea {
+    width: calc(100% - 22px); /* Account for padding */
+    padding: 8px 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 1em;
+}
+#template-edit-panel textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+#template-edit-panel .panel-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px; /* Keep reasonable margin above actions */
+}
+
+/* Generic Modal Button Styles */
+.modal-button {
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: background-color 0.2s, opacity 0.2s, border-color 0.2s;
+    border: 1px solid transparent;
+    background-color: transparent; /* Default */
+}
+.modal-button.primary {
+    background-color: var(--primary-color);
+    color: var(--primary-text-color);
+    border-color: var(--primary-color);
+}
+.modal-button.primary:hover { opacity: 0.9; }
+
+.modal-button.secondary {
+    background-color: var(--secondary-color);
+    color: var(--primary-text-color);
+    border-color: var(--secondary-color);
+}
+.modal-button.secondary:hover { opacity: 0.9; }
+
+.modal-button.danger { /* For delete buttons */
+     background-color: transparent;
+     color: var(--danger-color);
+     border-color: var(--danger-color);
+ }
+ .modal-button.danger:hover {
+     background-color: var(--danger-color);
+     color: var(--primary-text-color);
+     opacity: 0.9;
+ }
+
+#show-add-template-panel-btn { /* The "Create New Template" button */
+    background-color: var(--success-color);
+    color: var(--primary-text-color);
+    border: none;
+    margin-top: 10px; /* Add some space above it */
+}
+#show-add-template-panel-btn:hover { opacity: 0.9; }
 
