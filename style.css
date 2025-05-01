@@ -49,7 +49,7 @@
     --noise-opacity: 0.03;
     --noise-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
 
-    /* Move Note Menu */
+    /* NEW: Move Note Menu */
     --move-menu-bg: var(--card-bg-color);
     --move-menu-border: var(--border-color);
     --move-menu-shadow: var(--shadow-hover-color);
@@ -122,7 +122,7 @@ body.dark-mode {
      /* Noise texture for Dark Mode */
      --noise-opacity: 0.04;
 
-     /* Move Note Menu Dark */
+     /* NEW: Move Note Menu Dark */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -185,7 +185,7 @@ body.theme-sepia {
     /* Noise texture for Sepia */
      --noise-opacity: 0.05;
 
-     /* Move Note Menu Sepia */
+     /* NEW: Move Note Menu Sepia */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -245,7 +245,7 @@ body.theme-solarized-light {
     /* Noise texture for Solarized Light */
      --noise-opacity: 0.03;
 
-     /* Move Note Menu Solarized Light */
+     /* NEW: Move Note Menu Solarized Light */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -306,7 +306,7 @@ body.theme-solarized-dark {
      /* Noise texture for Solarized Dark */
      --noise-opacity: 0.04;
 
-     /* Move Note Menu Solarized Dark */
+     /* NEW: Move Note Menu Solarized Dark */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -368,7 +368,7 @@ body.theme-monochrome {
 body {
     font-family: var(--content-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif);
     margin: 0;
-    padding: 20px;
+    padding: 20px; /* Padding mặc định cho desktop */
     background-color: var(--bg-color);
     color: var(--text-color);
     font-size: calc(1rem * var(--font-size-scale, 1));
@@ -391,16 +391,16 @@ body {
     margin: 0;
     font-size: 1.8em;
     color: var(--primary-color);
-    white-space: nowrap;
+    white-space: nowrap; /* Giữ tiêu đề trên 1 dòng (trên desktop) */
     overflow: hidden;
     text-overflow: ellipsis;
     flex-shrink: 0;
-    margin-right: auto;
+    margin-right: auto; /* Đẩy các nút actions sang phải */
 }
 
 .header-actions {
     display: flex;
-    flex-wrap: wrap; /* Allow button wrapping on smaller screens */
+    flex-wrap: wrap; /* Cho phép nút xuống hàng */
     gap: 8px;
     align-items: center;
     flex-shrink: 0;
@@ -427,15 +427,16 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 /* === Notebook Tabs Styles === */
 .notebook-tabs {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: nowrap; /* Không xuống hàng, cho phép cuộn ngang */
     gap: 2px;
     padding: 0;
     margin-bottom: 25px;
     border-bottom: 1px solid var(--tab-border-color);
-    overflow-x: auto;
-    scrollbar-width: thin;
+    overflow-x: auto; /* Cho phép cuộn ngang */
+    scrollbar-width: thin; /* Style thanh cuộn */
     scrollbar-color: var(--secondary-color) var(--bg-color);
 }
+/* Style thanh cuộn cho Webkit (Chrome, Safari) */
 .notebook-tabs::-webkit-scrollbar { height: 6px; }
 .notebook-tabs::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 3px; }
 .notebook-tabs::-webkit-scrollbar-thumb { background-color: var(--secondary-color); border-radius: 3px; }
@@ -450,11 +451,11 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
     cursor: pointer;
     font-size: 0.95em;
     font-weight: 500;
-    white-space: nowrap;
+    white-space: nowrap; /* Giữ tên tab trên 1 dòng */
     transition: color 0.2s, border-color 0.2s, background-color 0.2s;
     border-radius: var(--tab-radius);
-    margin-bottom: -1px;
-    flex-shrink: 0;
+    margin-bottom: -1px; /* Che đường border bottom của container */
+    flex-shrink: 0; /* Ngăn tab bị co lại */
     position: relative;
 }
 
@@ -467,26 +468,26 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
     color: var(--tab-active-text);
     background-color: var(--tab-active-bg);
     border-color: var(--tab-border-color);
-    border-bottom-color: var(--tab-active-bg);
+    border-bottom-color: var(--tab-active-bg); /* Làm nền tab che đường border bottom */
     font-weight: 600;
-    z-index: 1;
+    z-index: 1; /* Đảm bảo tab active nổi lên trên */
 }
 
 .add-tab-button {
     padding: 8px 12px;
-    margin-left: 8px;
-    margin-bottom: 2px;
+    margin-left: 8px; /* Khoảng cách với tab cuối */
+    margin-bottom: 2px; /* Căn chỉnh với các tab khác */
     border: 1px solid var(--secondary-color);
-    border-radius: 50%;
+    border-radius: 50%; /* Làm nút tròn */
     background-color: transparent;
     color: var(--secondary-color);
     font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
     transition: color 0.2s, border-color 0.2s, background-color 0.2s, transform 0.1s;
-    line-height: 1;
+    line-height: 1; /* Đảm bảo dấu "+" căn giữa */
     flex-shrink: 0;
-    align-self: center;
+    align-self: center; /* Căn giữa theo chiều dọc với các tab */
 }
 
 .add-tab-button:hover {
@@ -498,8 +499,8 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 
 
 .controls-container { margin-bottom: 30px; position: relative; }
-#search-input { display: block; width: calc(100% - 22px); padding: 10px; margin-bottom: 20px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; }
-#search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
+#search-input { display: block; width: calc(100% - 22px); /* Trừ padding 2 bên */ padding: 10px; margin-bottom: 20px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; }
+#search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); /* Cần định nghĩa --rgb-primary-color nếu muốn dùng */ }
 
 
 /* --- Panel Thêm Note --- */
@@ -507,7 +508,7 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 .hidden { display: none !important; }
 #add-note-panel .form-group { margin-bottom: 15px; }
 #add-note-panel label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em; color: var(--secondary-color); }
-#add-note-panel select, #add-note-panel textarea, #add-note-panel input[type="text"] { display: block; width: calc(100% - 22px); padding: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; font-family: inherit; }
+#add-note-panel select, #add-note-panel textarea, #add-note-panel input[type="text"] { display: block; width: calc(100% - 22px); /* Trừ padding 2 bên */ padding: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; font-family: inherit; }
 #add-note-panel select { width: 100%; cursor: pointer; }
 #add-note-panel textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
 #add-note-panel input:focus, #add-note-panel textarea:focus, #add-note-panel select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
@@ -519,7 +520,12 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 
 
 /* --- Notes Container & Note Card (IMPROVED + DOG-EAR + NOISE) --- */
-#notes-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: var(--note-gap, 20px); }
+#notes-container {
+    display: grid;
+    /* Tự động điều chỉnh số cột, mỗi cột tối thiểu 250px, tối đa 1 phần bằng nhau */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--note-gap, 20px); /* Khoảng cách giữa các note */
+}
 .note {
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -528,15 +534,15 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
     display: flex;
     flex-direction: column;
     transition: box-shadow 0.25s ease-in-out, transform 0.25s ease-in-out, background-color 0.3s, border-color 0.3s, border-left-color 0.3s;
-    cursor: grab;
-    user-select: none;
+    cursor: grab; /* Con trỏ kéo thả */
+    user-select: none; /* Ngăn chọn text khi kéo */
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     position: relative;
-    overflow: hidden;
-    min-height: 150px;
-    border-left: 5px solid transparent;
+    overflow: hidden; /* Quan trọng cho dog-ear và noise */
+    min-height: 150px; /* Chiều cao tối thiểu */
+    border-left: 5px solid transparent; /* Viền màu bên trái */
     background-color: var(--card-bg-color);
 }
 
@@ -550,16 +556,16 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
     height: 100%;
     background-image: var(--noise-url);
     opacity: var(--noise-opacity);
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; /* Cho phép click xuyên qua */
+    z-index: 0; /* Nằm dưới nội dung */
     transition: opacity 0.3s;
 }
 
 
-.note:active { cursor: grabbing; }
+.note:active { cursor: grabbing; } /* Con trỏ khi đang kéo */
 .note:hover {
     box-shadow: 0 5px 15px var(--shadow-hover-color);
-    transform: translateY(-3px);
+    transform: translateY(-3px); /* Hiệu ứng nhấc lên */
 }
 
 /* Dog-ear effect */
@@ -572,7 +578,7 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
     border-style: solid;
     border-color: transparent transparent var(--dog-ear-bg) var(--dog-ear-bg);
     box-shadow: -1px 1px 2px var(--dog-ear-shadow);
-    z-index: 1;
+    z-index: 1; /* Nằm trên noise, dưới nội dung */
     transition: border-color 0.3s;
 }
 /* Adjust dog-ear color for colored notes */
@@ -592,46 +598,75 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 .note.note-color-red { background-color: var(--note-color-red-bg); border-left-color: var(--note-color-red-border); }
 .note.note-color-purple { background-color: var(--note-color-purple-bg); border-left-color: var(--note-color-purple-border); }
 .note.note-color-grey { background-color: var(--note-color-grey-bg); border-left-color: var(--note-color-grey-border); }
+/* Reset các border khác khi có màu */
 .note[class*="note-color-"] { border-top-color: transparent; border-right-color: transparent; border-bottom-color: transparent; }
 
 .note-title {
     font-size: 1.15em;
     font-weight: 600;
     margin: 0 0 10px 0;
-    word-wrap: break-word;
+    word-wrap: break-word; /* Tự xuống dòng nếu tiêu đề dài */
     color: var(--primary-color);
-    position: relative;
-    z-index: 1;
+    position: relative; /* Để z-index hoạt động */
+    z-index: 1; /* Nằm trên noise và dog-ear */
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 12px;
 }
 .note-content {
-    flex-grow: 1;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+    flex-grow: 1; /* Cho phép nội dung chiếm không gian còn lại */
+    word-wrap: break-word; /* Tự xuống dòng */
+    white-space: pre-wrap; /* Giữ lại khoảng trắng và xuống dòng từ textarea */
     font-size: 1em;
     position: relative;
     z-index: 1;
-    max-height: 200px;
-    overflow: hidden;
+    max-height: 200px; /* Giới hạn chiều cao ban đầu */
+    overflow: hidden; /* Ẩn phần nội dung thừa */
     font-family: var(--content-font-family, inherit);
     line-height: 1.5;
     color: var(--text-color);
 }
+/* Lớp phủ mờ dần cho nội dung bị tràn */
 .note-content.has-overflow { position: relative; }
-.note-content.has-overflow::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: linear-gradient(to top, var(--fade-color-end), var(--fade-color-start)); pointer-events: none; z-index: 2; }
-.read-more-btn { display: block; margin: 5px auto 0 auto; padding: 3px 10px; font-size: 0.8em; color: var(--primary-color); background-color: transparent; border: none; border-radius: 4px; cursor: pointer; text-align: center; z-index: 3; position: relative; text-decoration: underline; opacity: 0.8; }
+.note-content.has-overflow::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(to top, var(--fade-color-end), var(--fade-color-start));
+    pointer-events: none;
+    z-index: 2; /* Nằm trên cả nội dung */
+}
+/* Nút "Xem thêm" */
+.read-more-btn {
+    display: block;
+    margin: 5px auto 0 auto;
+    padding: 3px 10px;
+    font-size: 0.8em;
+    color: var(--primary-color);
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    z-index: 3; /* Nằm trên lớp phủ mờ */
+    position: relative;
+    text-decoration: underline;
+    opacity: 0.8;
+}
 .read-more-btn:hover { opacity: 1; }
+
 .note-timestamp { font-size: 0.8em; color: var(--secondary-color); margin-bottom: 10px; display: block; position: relative; z-index: 1; opacity: 0.8; }
 .note-tags { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; position: relative; z-index: 1; }
 .tag-badge { background-color: var(--tag-bg-color); color: var(--tag-text-color); padding: 3px 8px; border-radius: 10px; font-size: 0.8em; transition: background-color 0.2s, color 0.2s, opacity 0.2s; border: none; cursor: pointer; line-height: 1.4; opacity: 0.9; }
 .tag-badge:hover { opacity: 1; background-color: var(--primary-color); color: var(--primary-text-color); }
-.note-actions { display: flex; justify-content: flex-end; align-items: center; gap: 5px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto; position: relative; z-index: 1; }
+.note-actions { display: flex; justify-content: flex-end; align-items: center; gap: 5px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: auto; /* Đẩy xuống dưới cùng */ position: relative; z-index: 1; }
 .note-actions button { padding: 5px; border: none; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1em; transition: opacity 0.2s, color 0.2s, background-color 0.2s; background-color: transparent; color: var(--secondary-color); line-height: 1; }
 .note-actions button:hover {
     opacity: 1;
-    background-color: rgba(128, 128, 128, 0.15);
+    background-color: rgba(128, 128, 128, 0.15); /* Nền nhẹ khi hover */
 }
 .note-actions .edit-btn { color: var(--primary-color); }
 .note-actions .delete-btn, .note-actions .delete-permanent-btn { color: var(--danger-color); }
@@ -644,66 +679,105 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 
 
 /* --- Note Edit Mode --- */
-.note input[type="text"].edit-title-input, .note textarea.edit-input, .note input[type="text"].edit-tags-input { display: block; width: calc(100% - 12px); margin-bottom: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; padding: 5px; cursor: text; position: relative; z-index: 2; font-family: inherit; }
+.note input[type="text"].edit-title-input,
+.note textarea.edit-input,
+.note input[type="text"].edit-tags-input {
+    display: block;
+    width: calc(100% - 12px); /* Trừ padding 2 bên */
+    margin-bottom: 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 1em;
+    padding: 5px;
+    cursor: text;
+    position: relative;
+    z-index: 2; /* Nằm trên các hiệu ứng nền */
+    font-family: inherit;
+}
 .note input[type="text"].edit-title-input {
     font-weight: 600;
     border-bottom: 1px solid var(--input-border-color);
     padding-bottom: 5px;
     margin-bottom: 10px;
 }
-.note textarea.edit-input { min-height: 80px; resize: vertical; line-height: 1.5; white-space: pre-wrap; margin-top: 0; }
+.note textarea.edit-input {
+    min-height: 80px;
+    resize: vertical;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    margin-top: 0;
+}
 
 .note input:focus, .note textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
-.note input[type="text"].edit-title-input { font-weight: 600; }
-.note textarea.edit-input { min-height: 80px; resize: vertical; line-height: 1.5; white-space: pre-wrap; }
+
 
 /* --- Color Selector Styles --- */
 .color-selector-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 12px; padding: 5px 0; position: relative; z-index: 2; }
-.color-swatch-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; font-size: 0; transition: transform 0.1s ease-out, border-color 0.2s, box-shadow 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+.color-swatch-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; font-size: 0; /* Ẩn text nếu có */ transition: transform 0.1s ease-out, border-color 0.2s, box-shadow 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
 .color-swatch-btn:hover { transform: scale(1.1); }
-.color-swatch-btn.selected { border-color: var(--primary-color); transform: scale(1.15); box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--primary-color); }
+.color-swatch-btn.selected { border-color: var(--primary-color); transform: scale(1.15); box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--primary-color); /* Hiệu ứng viền kép */ }
 .color-swatch-btn.default-color-swatch { background-color: var(--card-bg-color); border: 1px dashed var(--secondary-color); color: var(--secondary-color); font-size: 14px; line-height: 20px; text-align: center; box-shadow: none; }
 .color-swatch-btn.default-color-swatch:hover { border-style: solid; border-color: var(--secondary-color); }
 .color-swatch-btn.default-color-swatch.selected { border: 2px solid var(--primary-color) !important; box-shadow: 0 0 0 2px var(--bg-color), 0 0 0 4px var(--primary-color); background-color: var(--card-bg-color); color: var(--primary-color); }
 
 /* --- Other Styles --- */
-.empty-state { grid-column: 1 / -1; text-align: center; color: var(--secondary-color); padding: 30px; font-style: italic; }
+.empty-state { grid-column: 1 / -1; /* Chiếm toàn bộ grid */ text-align: center; color: var(--secondary-color); padding: 30px; font-style: italic; }
 #template-list-container .empty-state,
-#notebook-list-container .empty-state { padding: 15px; grid-column: auto; }
+#notebook-list-container .empty-state { padding: 15px; grid-column: auto; /* Reset grid-column trong modal */ }
+
+/* --- SortableJS Styles --- */
 .note.sortable-ghost { opacity: 0.4; background-color: var(--primary-color) !important; border: 1px dashed var(--primary-text-color); transform: translateY(0); }
 .note.sortable-chosen { opacity: 0.9; box-shadow: 0 5px 15px var(--shadow-color); transform: scale(1.02) translateY(-3px); cursor: grabbing; }
 .note.sortable-drag { opacity: 0.9; cursor: grabbing; transform: scale(1.02) translateY(-3px); }
+
+/* --- Floating Action Button (FAB) --- */
 .fab { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; background-color: var(--fab-bg-color); color: var(--fab-text-color); border: none; border-radius: 50%; font-size: 28px; line-height: 55px; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1000; transition: transform 0.2s ease-in-out, background-color 0.3s, visibility 0s linear 0.1s, opacity 0.1s linear; }
 .fab:hover { transform: scale(1.1); }
 .fab.hidden { visibility: hidden; opacity: 0; transform: scale(0.5); transition-delay: 0s; }
+
+/* --- Tag Suggestions --- */
 .tag-suggestions { position: absolute; background-color: var(--card-bg-color); border: 1px solid var(--border-color); border-radius: 4px; box-shadow: 0 4px 8px var(--shadow-color); max-height: 150px; overflow-y: auto; z-index: 1001; width: auto; min-width: 150px; margin-top: 2px; }
 .suggestion-item { padding: 8px 12px; cursor: pointer; font-size: 0.9em; color: var(--text-color); border-bottom: 1px solid var(--border-color); white-space: nowrap; outline: none; }
 .suggestion-item:last-child { border-bottom: none; }
 .suggestion-item:hover, .suggestion-item:focus { background-color: var(--setting-option-hover-bg); color: var(--primary-color); }
+
+/* --- Highlighted Text (Search) --- */
 mark { background-color: var(--highlight-bg-color); color: var(--highlight-text-color); padding: 0.1em 0.2em; border-radius: 3px; box-shadow: 0 0 0 1px var(--highlight-bg-color); }
 
 /* --- Modal Styles (Generic) --- */
-.modal { position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background-color: var(--modal-backdrop-color); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
-.modal.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; overflow-y: auto; }
-.modal:not(.hidden) { display: flex; }
-.modal-content { background-color: var(--modal-content-bg); color: var(--text-color); margin: 5vh auto; padding: 20px 25px; border: 1px solid var(--modal-border-color); border-radius: 8px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; transition: transform 0.3s ease; transform: scale(0.95); }
+.modal { position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; /* Ban đầu ẩn scroll */ background-color: var(--modal-backdrop-color); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.modal.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; overflow-y: auto; /* Cho phép scroll khi hiện */ }
+.modal:not(.hidden) { display: flex; } /* Đảm bảo modal hiển thị khi cần */
+.modal-content { background-color: var(--modal-content-bg); color: var(--text-color); margin: 5vh auto; /* Căn giữa và cách top/bottom 5% viewport height */ padding: 20px 25px; border: 1px solid var(--modal-border-color); border-radius: 8px; width: 90%; /* Mặc định cho mobile */ max-height: 90vh; /* Giới hạn chiều cao */ overflow-y: auto; /* Cho phép nội dung modal scroll */ box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative; display: flex; flex-direction: column; transition: transform 0.3s ease; transform: scale(0.95); /* Hiệu ứng zoom nhẹ */ }
 .modal.visible .modal-content { transform: scale(1); }
+/* Đặt max-width cụ thể cho từng loại modal (trên desktop) */
 .note-modal .modal-content { max-width: 700px; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; flex-shrink: 0; }
+.template-modal-content { max-width: 600px; }
+.notebook-modal-content { max-width: 550px; }
+.settings-modal-content { max-width: 650px; }
+
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; flex-shrink: 0; /* Ngăn header co lại */ }
 .modal-header h2 { margin: 0; font-size: 1.4em; color: var(--primary-color); }
-.modal-body { line-height: 1.6; flex-grow: 1; padding-top: 5px; }
-.note-modal .modal-body { white-space: pre-wrap; }
+.modal-body { line-height: 1.6; flex-grow: 1; /* Cho phép body chiếm không gian */ padding-top: 5px; }
+.note-modal .modal-body { white-space: pre-wrap; /* Giữ định dạng text trong modal xem note */ }
 .close-modal-btn { background: none; border: none; color: var(--secondary-color); font-size: 28px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
 .close-modal-btn:hover, .close-modal-btn:focus { color: var(--text-color); opacity: 0.8; outline: none; }
 
 /* --- Auto-save / Manual Save Visual Feedback --- */
 @keyframes flash-border { 0% { box-shadow: 0 0 0 0 rgba(var(--rgb-success-color, 25, 135, 84), 0.5); } 70% { box-shadow: 0 0 0 5px rgba(var(--rgb-success-color, 25, 135, 84), 0); } 100% { box-shadow: 0 0 0 0 rgba(var(--rgb-success-color, 25, 135, 84), 0); } }
-.note.note-autosaved, .note.note-saved-flash { box-shadow: 0 0 0 2px var(--success-color); transition: box-shadow 0.2s ease-out; }
-body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box-shadow: 0 0 0 2px var(--success-color); }
+.note.note-autosaved, .note.note-saved-flash {
+    /* animation: flash-border 0.6s ease-out; */ /* Tùy chọn: dùng animation thay vì chỉ đổi shadow */
+    box-shadow: 0 0 0 2px var(--success-color);
+    transition: box-shadow 0.2s ease-out;
+}
+body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash {
+    box-shadow: 0 0 0 2px var(--success-color);
+}
 
 
 /* --- Template Management Modal --- */
-.template-modal-content { max-width: 600px; }
 #template-list-section { margin-bottom: 20px; }
 #template-list-section h3, #template-edit-panel h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em; color: var(--primary-color); }
 #template-list-container { margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 5px; }
@@ -714,13 +788,12 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 #template-edit-panel { padding: 15px; border: 1px solid var(--border-color); border-radius: 5px; background-color: var(--setting-section-bg); }
 #template-edit-panel .form-group { margin-bottom: 12px; }
 #template-edit-panel label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 0.9em; color: var(--secondary-color); }
-#template-edit-panel input[type="text"], #template-edit-panel textarea { width: calc(100% - 22px); padding: 8px 10px; border: 1px solid var(--input-border-color); border-radius: 4px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; font-family: inherit; }
+#template-edit-panel input[type="text"], #template-edit-panel textarea { width: calc(100% - 22px); /* Trừ padding */ padding: 8px 10px; border: 1px solid var(--input-border-color); border-radius: 4px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; font-family: inherit; }
 #template-edit-panel input:focus, #template-edit-panel textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
 #template-edit-panel textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
 #template-edit-panel .panel-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
 
 /* === Notebook Modal Styles === */
-.notebook-modal-content { max-width: 550px; }
 #notebook-list-section { margin-bottom: 20px; }
 #notebook-list-section h3, #notebook-edit-panel h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em; color: var(--primary-color); }
 #notebook-list-container { margin-top: 15px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; padding: 5px; }
@@ -746,7 +819,7 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
     min-width: 150px;
     max-height: 200px;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 10; /* Nằm trên note */
     padding: 5px 0;
 }
 .move-note-menu button {
@@ -769,7 +842,7 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
     font-weight: bold;
     color: var(--primary-color);
     cursor: default;
-    background-color: transparent !important;
+    background-color: transparent !important; /* Ghi đè hover */
 }
 .move-note-menu hr {
     border: none;
@@ -793,7 +866,6 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 #show-add-notebook-panel-btn:hover { opacity: 0.9; }
 
 /* === CSS CHO MODAL CÀI ĐẶT === */
-.settings-modal-content { max-width: 650px; }
 .setting-section { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
 .setting-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
 .setting-section h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em; color: var(--primary-color); }
@@ -805,93 +877,224 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 #font-family-select { width: 100%; padding: 8px 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 0.95em; cursor: pointer; }
 body.dark-mode #font-family-select option { background-color: var(--card-bg-color); color: var(--text-color); }
 .font-size-control { display: flex; align-items: center; gap: 15px; }
-#font-size-slider { flex-grow: 1; cursor: pointer; accent-color: var(--primary-color); }
+#font-size-slider { flex-grow: 1; cursor: pointer; accent-color: var(--primary-color); /* Màu của thanh slider */ }
 #font-size-value { min-width: 45px; text-align: right; font-weight: 500; color: var(--secondary-color); }
-#reset-font-size-btn {}
+#reset-font-size-btn {} /* Không cần style đặc biệt nếu dùng class modal-button */
 
 /* Tiện ích ẩn accessibly */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
 
-/* === Media Queries for Mobile Responsiveness === */
-@media (max-width: 640px) {
+
+/* ===================================================================== */
+/* ==================== MOBILE RESPONSIVE STYLES ======================= */
+/* ===================================================================== */
+
+@media (max-width: 768px) { /* Breakpoint cho tablet nhỏ và điện thoại lớn */
     body {
-        padding: 15px;
+        padding: 10px; /* Giảm padding trên màn hình nhỏ */
+        font-size: calc(0.95rem * var(--font-size-scale, 1)); /* Có thể giảm nhẹ cỡ chữ cơ bản */
     }
 
+    :root {
+         --note-gap: 12px; /* Giảm khoảng cách giữa các note */
+    }
+
+    /* Grid cho notes thường tự xử lý tốt, nhưng có thể giảm minmax nếu cần */
+    /* #notes-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    } */
+
+    /* --- Header cho Mobile --- */
     .app-header {
-        gap: 10px;
+        flex-direction: column; /* Chuyển sang bố cục cột */
+        align-items: center; /* Căn giữa các thành phần */
         padding-bottom: 10px;
     }
+
     .app-header h1 {
-        font-size: 1.5em;
+        margin: 0 0 10px 0; /* Bỏ margin-right, thêm margin-bottom */
+        white-space: normal; /* Cho phép tiêu đề xuống dòng */
+        text-align: center; /* Căn giữa tiêu đề */
+        font-size: 1.6em;
     }
+
     .header-actions {
-        gap: 5px;
-        flex-wrap: nowrap; /* Prevent internal button wrapping */
-        overflow-x: auto; /* Allow horizontal scroll for buttons */
-        padding-bottom: 5px; /* Add padding for scrollbar */
-        /* Optional: Style scrollbar for webkit */
-        /* &::-webkit-scrollbar { height: 4px; } */
-        /* &::-webkit-scrollbar-thumb { background-color: var(--secondary-color); border-radius: 2px;} */
+        width: 100%; /* Cho phép các nút chiếm toàn bộ chiều rộng */
+        justify-content: center; /* Căn giữa các nút */
+        gap: 8px; /* Giảm khoảng cách nút */
     }
 
     .header-actions button {
-        padding: 6px 10px;
+        padding: 6px 10px; /* Làm nút nhỏ hơn */
         font-size: 0.85em;
-        flex-shrink: 0;
-    }
-    #theme-toggle-btn {
-        min-width: 90px;
     }
 
-    .notebook-tabs {
-        margin-bottom: 20px;
-    }
-    .tab-button {
-        padding: 8px 12px;
-        font-size: 0.9em;
-    }
-    .add-tab-button {
-        padding: 6px 10px;
-        font-size: 1em;
+    /* Chỉ báo trạng thái */
+    .archive-status, .trash-status {
+        margin-top: 10px;
+        margin-bottom: 10px;
     }
 
-    #notes-container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 15px;
-    }
-
-    .note {
-        padding: 12px 15px;
-    }
-
+    /* --- Nút FAB cho Mobile --- */
     .fab {
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        line-height: 50px;
+         bottom: 15px;
+         right: 15px;
+         width: 50px;
+         height: 50px;
+         font-size: 24px;
+         line-height: 50px;
     }
 
+    /* --- Tăng kích thước vùng chạm cho các nút action trong note --- */
+    .note-actions button {
+         width: 34px; /* Lớn hơn một chút */
+         height: 34px;
+         font-size: 1.2em; /* Có thể tăng nhẹ icon size */
+    }
+    .note-actions .edit-btn, .note-actions .delete-btn {
+        font-size: 0.85em; /* Giữ text button nhỏ */
+    }
+     .note-actions .delete-permanent-btn {
+        font-size: 0.75em;
+    }
+
+
+    /* --- Điều chỉnh Modal cho Mobile --- */
     .modal-content {
-        padding: 15px 20px;
-        margin: 2vh auto;
-        max-height: 95vh;
+         padding: 15px 20px; /* Giảm padding trong modal */
+         width: 95%; /* Tăng nhẹ chiều rộng modal so với body */
+         max-height: 95vh; /* Tăng nhẹ max-height */
+         margin: 2.5vh auto; /* Căn giữa với margin nhỏ hơn */
     }
     .modal-header h2 {
-        font-size: 1.3em;
+         font-size: 1.2em; /* Giảm cỡ chữ tiêu đề modal */
+    }
+    .close-modal-btn {
+        font-size: 26px; /* Giảm nhẹ nút đóng */
     }
 
-    /* Adjust note action button size */
-    .note-actions button {
-        width: 28px;
-        height: 28px;
+    /* --- Panel Thêm Note --- */
+    #add-note-panel {
+        padding: 15px;
+    }
+    #add-note-panel textarea {
+        min-height: 60px; /* Giảm chiều cao tối thiểu textarea */
+    }
+    #add-note-panel .panel-actions {
+        gap: 8px;
+    }
+     #add-note-panel #add-note-btn {
+        padding: 8px 15px;
+        font-size: 0.95em;
+     }
+     #add-note-panel #close-add-panel-btn {
+        padding: 6px 12px;
+        font-size: 0.85em;
+     }
+
+     /* --- Tag Suggestions --- */
+     .tag-suggestions {
+        max-height: 120px; /* Giảm chiều cao tối đa box gợi ý */
+     }
+     .suggestion-item {
+        padding: 6px 10px;
+        font-size: 0.85em;
+     }
+}
+
+@media (max-width: 600px) { /* Breakpoint nhỏ hơn cho nội dung modal và form */
+
+    /* --- Tối ưu Form trong Modal --- */
+    #template-edit-panel .form-group,
+    #notebook-edit-panel .form-group,
+    .settings-modal-content .form-group {
+        /* Đảm bảo label và input/select/textarea hiển thị tốt */
+        /* Mặc định có thể đã ổn với display: block, nhưng có thể cần: */
+        /* display: flex; */
+        /* flex-direction: column; */
+        /* align-items: flex-start; */
+    }
+    #template-edit-panel .panel-actions,
+    #notebook-edit-panel .panel-actions,
+    .settings-modal-content .panel-actions { /* Nếu có class này */
+        flex-wrap: wrap; /* Đảm bảo nút trong modal tự xuống hàng */
+        justify-content: center; /* Căn giữa các nút */
+        gap: 8px;
+    }
+
+    /* --- Tối ưu lưới trong Cài đặt --- */
+    .settings-modal-content .setting-options-grid {
+         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Giảm min cho nút theme/accent */
+         gap: 8px;
+    }
+     .settings-modal-content .setting-option-button {
+         padding: 8px 10px;
+         font-size: 0.9em;
+     }
+
+    /* --- Nút Modal chung --- */
+    .modal-button {
+        padding: 7px 12px;
+        font-size: 0.9em;
+    }
+     .modal-button.small-button {
+        padding: 4px 8px !important;
+        font-size: 0.8em !important;
+    }
+
+    /* --- Font Size Control trong Cài đặt --- */
+    .font-size-control {
+        gap: 10px; /* Giảm khoảng cách */
+    }
+    #font-size-value {
+        min-width: 40px;
+    }
+}
+
+@media (max-width: 400px) { /* Breakpoint cho màn hình rất nhỏ */
+     :root {
+         --note-gap: 8px; /* Giảm thêm khoảng cách note */
+     }
+     #notes-container {
+        /* Đảm bảo ít nhất 1 cột hiển thị tốt */
+        grid-template-columns: repeat(auto-fill, minmax(calc(100% - 20px), 1fr)); /* Chiếm gần hết chiều rộng */
+     }
+
+     .app-header h1 {
+        font-size: 1.4em; /* Giảm thêm cỡ chữ tiêu đề */
+     }
+
+     .header-actions button {
+        padding: 5px 8px;
+        font-size: 0.8em;
+     }
+
+     .tab-button {
+        padding: 8px 12px; /* Giảm padding tab */
+        font-size: 0.9em;
+     }
+     .add-tab-button {
+        padding: 6px 10px;
         font-size: 1em;
-    }
-    .note-actions .delete-permanent-btn,
-    .note-actions .edit-btn,
-    .note-actions .delete-btn {
-        font-size: 0.75em; /* Further reduce font size for text buttons */
-    }
+     }
+
+     #search-input {
+        padding: 8px;
+        font-size: 0.95em;
+     }
+
+     .note {
+        padding: 12px 15px; /* Giảm padding note */
+     }
+     .note-title {
+        font-size: 1.1em;
+     }
+     .note-content {
+        font-size: 0.95em;
+        max-height: 150px; /* Giảm max-height nội dung */
+     }
+     .note-timestamp, .tag-badge {
+        font-size: 0.75em;
+     }
+
 }
