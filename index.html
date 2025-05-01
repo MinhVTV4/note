@@ -14,11 +14,7 @@
 <body>
 
     <header class="app-header">
-        <div class="title-with-quickadd">
-            <h1>Ghi Chú Khởi Đầu</h1>
-            <button id="quick-add-note-btn" title="Tạo ghi chú nhanh">⚡</button>
-        </div>
-
+        <h1>Ghi Chú Khởi Đầu</h1>
         <div class="header-actions">
             <button id="manage-notebooks-btn" title="Quản lý các sổ tay">Quản lý Sổ tay</button>
             <button id="manage-templates-btn" title="Quản lý các mẫu ghi chú">Quản lý Mẫu</button>
@@ -30,6 +26,7 @@
             <input type="file" id="import-file-input" accept=".json" class="hidden">
             <button id="settings-btn" title="Mở cài đặt giao diện">Cài đặt</button>
             <button id="theme-toggle-btn" title=""></button>
+
         </div>
          <div id="archive-status-indicator" class="archive-status hidden">Đang xem các ghi chú đã lưu trữ.</div>
          <div id="trash-status-indicator" class="archive-status hidden">Đang xem Thùng rác.</div>
@@ -40,6 +37,7 @@
         <button id="add-notebook-tab-btn" class="add-tab-button" title="Thêm Sổ tay mới">+</button>
     </div>
 
+
     <div class="controls-container">
         <input type="search" id="search-input" placeholder="Tìm kiếm ghi chú (tiêu đề, nội dung hoặc #tag)...">
         <div id="add-note-panel" class="hidden">
@@ -47,7 +45,7 @@
                  <label for="template-select">Sử dụng mẫu:</label>
                  <select id="template-select">
                      <option value="">-- Không dùng mẫu --</option>
-                 </select>
+                     </select>
              </div>
              <input type="text" id="new-note-title" placeholder="Tiêu đề (tùy chọn)...">
             <textarea id="new-note-text" placeholder="Nhập nội dung ghi chú..."></textarea>
@@ -63,15 +61,6 @@
         </div>
 
     <button id="show-add-panel-btn" class="fab" title="Thêm ghi chú mới">+</button>
-
-    <div id="quick-add-panel" class="modal hidden simple-modal" role="dialog" aria-modal="true" aria-labelledby="quick-add-title">
-        <div class="modal-content quick-add-content">
-            <h3 id="quick-add-title" class="sr-only">Tạo ghi chú nhanh</h3> <textarea id="quick-add-textarea" placeholder="Nhập ghi chú nhanh..." aria-label="Nội dung ghi chú nhanh"></textarea>
-            <div class="quick-add-actions panel-actions"> <button id="save-quick-note-btn" class="modal-button primary">Lưu</button>
-                 <button id="close-quick-add-btn" class="modal-button secondary">Đóng</button>
-            </div>
-        </div>
-    </div>
 
     <div id="notebook-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="notebook-modal-title">
         <div class="modal-content notebook-modal-content">
@@ -115,7 +104,7 @@
                     <h3>Danh sách Mẫu</h3>
                     <div id="template-list-container">
                         <p class="empty-state">Chưa có mẫu nào.</p>
-                    </div>
+                        </div>
                     <button id="show-add-template-panel-btn" class="modal-button primary">Tạo Mẫu Mới</button>
                 </div>
 
@@ -154,6 +143,7 @@
                 <button id="close-settings-modal-btn" class="close-modal-btn" title="Đóng (Esc)" aria-label="Đóng cửa sổ cài đặt">&times;</button>
             </div>
             <div class="modal-body">
+
                 <div class="setting-section">
                     <h3>Chủ đề (Theme)</h3>
                     <div class="theme-options setting-options-grid" role="radiogroup" aria-labelledby="theme-label">
@@ -168,7 +158,7 @@
                         <button class="theme-option-btn setting-option-button" data-theme="gruvbox-light" role="radio" aria-checked="false">Gruvbox Sáng</button>
                         <button class="theme-option-btn setting-option-button" data-theme="dracula" role="radio" aria-checked="false">Dracula</button>
                         <button class="theme-option-btn setting-option-button" data-theme="monochrome" role="radio" aria-checked="false">Monochrome</button>
-                    </div>
+                        </div>
                 </div>
 
                 <div class="setting-section">
@@ -185,7 +175,7 @@
                          <button class="color-swatch-btn accent-swatch" data-color="#d63384" title="Hồng" style="background-color: #d63384;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#6610f2" title="Chàm (Indigo)" style="background-color: #6610f2;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#a0522d" title="Nâu (Sienna)" style="background-color: #a0522d;" role="radio" aria-checked="false"></button>
-                     </div>
+                         </div>
                  </div>
 
                 <div class="setting-section">
@@ -215,9 +205,7 @@
                      </div>
                  </div>
 
-            </div>
-        </div>
-    </div>
+                 </div> </div> </div>
 
     <script src="script.js" defer></script>
 
