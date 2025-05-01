@@ -49,7 +49,7 @@
     --noise-opacity: 0.03;
     --noise-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
 
-    /* NEW: Move Note Menu */
+    /* Move Note Menu */
     --move-menu-bg: var(--card-bg-color);
     --move-menu-border: var(--border-color);
     --move-menu-shadow: var(--shadow-hover-color);
@@ -122,7 +122,7 @@ body.dark-mode {
      /* Noise texture for Dark Mode */
      --noise-opacity: 0.04;
 
-     /* NEW: Move Note Menu Dark */
+     /* Move Note Menu Dark */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -185,7 +185,7 @@ body.theme-sepia {
     /* Noise texture for Sepia */
      --noise-opacity: 0.05;
 
-     /* NEW: Move Note Menu Sepia */
+     /* Move Note Menu Sepia */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -245,7 +245,7 @@ body.theme-solarized-light {
     /* Noise texture for Solarized Light */
      --noise-opacity: 0.03;
 
-     /* NEW: Move Note Menu Solarized Light */
+     /* Move Note Menu Solarized Light */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -306,7 +306,7 @@ body.theme-solarized-dark {
      /* Noise texture for Solarized Dark */
      --noise-opacity: 0.04;
 
-     /* NEW: Move Note Menu Solarized Dark */
+     /* Move Note Menu Solarized Dark */
      --move-menu-bg: var(--modal-content-bg);
      --move-menu-border: var(--modal-border-color);
      --move-menu-shadow: var(--shadow-hover-color);
@@ -811,3 +811,70 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
 
 /* Tiện ích ẩn accessibly */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+/* === NEW: Media Queries for Mobile Responsiveness === */
+@media (max-width: 640px) {
+    body {
+        padding: 15px; /* Giảm padding body */
+    }
+
+    .app-header {
+        gap: 10px; /* Giảm gap giữa title và actions */
+        padding-bottom: 10px;
+    }
+    .app-header h1 {
+        font-size: 1.5em; /* Giảm cỡ chữ tiêu đề */
+    }
+    .header-actions {
+        gap: 5px; /* Giảm gap nút header */
+    }
+    .header-actions button {
+        padding: 6px 10px; /* Giảm padding nút header */
+        font-size: 0.85em; /* Giảm cỡ chữ nút header */
+    }
+    #theme-toggle-btn {
+        min-width: 90px; /* Giảm chiều rộng tối thiểu nút theme */
+    }
+
+    .notebook-tabs {
+        margin-bottom: 20px; /* Giảm margin dưới tabs */
+    }
+    .tab-button {
+        padding: 8px 12px; /* Giảm padding tab */
+        font-size: 0.9em; /* Giảm cỡ chữ tab */
+    }
+    .add-tab-button {
+        padding: 6px 10px;
+        font-size: 1em;
+    }
+
+    #notes-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Cho phép cột nhỏ hơn */
+        gap: 15px; /* Giảm gap giữa note */
+    }
+
+    .note {
+        padding: 12px 15px; /* Giảm padding note */
+    }
+
+    .fab {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        line-height: 50px;
+    }
+
+    .modal-content {
+        padding: 15px 20px;
+        margin: 2vh auto; /* Giảm margin modal */
+        max-height: 95vh; /* Cho phép cao hơn chút */
+    }
+    .modal-header h2 {
+        font-size: 1.3em;
+    }
+
+    /* Có thể thêm các điều chỉnh khác nếu cần */
+}
+
