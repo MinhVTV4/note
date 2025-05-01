@@ -395,12 +395,12 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     flex-shrink: 0;
-    margin-right: auto;
+    margin-right: auto; /* Đẩy các nút actions sang phải */
 }
 
 .header-actions {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Cho phép nút bên trong wrap */
     gap: 8px;
     align-items: center;
     flex-shrink: 0;
@@ -812,36 +812,46 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
 /* Tiện ích ẩn accessibly */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
 
-/* === NEW: Media Queries for Mobile Responsiveness === */
+/* === Media Queries for Mobile Responsiveness === */
 @media (max-width: 640px) {
     body {
-        padding: 15px; /* Giảm padding body */
+        padding: 15px;
     }
 
     .app-header {
-        gap: 10px; /* Giảm gap giữa title và actions */
+        gap: 10px;
         padding-bottom: 10px;
     }
     .app-header h1 {
-        font-size: 1.5em; /* Giảm cỡ chữ tiêu đề */
+        font-size: 1.5em;
     }
     .header-actions {
-        gap: 5px; /* Giảm gap nút header */
+        gap: 5px;
+        /* UPDATED: Prevent internal button wrapping and allow scroll */
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        /* Optional: Add some padding if scrollbar appears */
+        padding-bottom: 5px;
+        /* Hide scrollbar visually if desired (might affect accessibility) */
+        /* scrollbar-width: none; */ /* Firefox */
     }
+    /* .header-actions::-webkit-scrollbar { display: none; } */ /* Chrome/Safari/Edge */
+
     .header-actions button {
-        padding: 6px 10px; /* Giảm padding nút header */
-        font-size: 0.85em; /* Giảm cỡ chữ nút header */
+        padding: 6px 10px;
+        font-size: 0.85em;
+        flex-shrink: 0; /* Prevent buttons from shrinking */
     }
     #theme-toggle-btn {
-        min-width: 90px; /* Giảm chiều rộng tối thiểu nút theme */
+        min-width: 90px;
     }
 
     .notebook-tabs {
-        margin-bottom: 20px; /* Giảm margin dưới tabs */
+        margin-bottom: 20px;
     }
     .tab-button {
-        padding: 8px 12px; /* Giảm padding tab */
-        font-size: 0.9em; /* Giảm cỡ chữ tab */
+        padding: 8px 12px;
+        font-size: 0.9em;
     }
     .add-tab-button {
         padding: 6px 10px;
@@ -849,12 +859,12 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
     }
 
     #notes-container {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Cho phép cột nhỏ hơn */
-        gap: 15px; /* Giảm gap giữa note */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
     }
 
     .note {
-        padding: 12px 15px; /* Giảm padding note */
+        padding: 12px 15px;
     }
 
     .fab {
@@ -868,13 +878,22 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
 
     .modal-content {
         padding: 15px 20px;
-        margin: 2vh auto; /* Giảm margin modal */
-        max-height: 95vh; /* Cho phép cao hơn chút */
+        margin: 2vh auto;
+        max-height: 95vh;
     }
     .modal-header h2 {
         font-size: 1.3em;
     }
 
-    /* Có thể thêm các điều chỉnh khác nếu cần */
+    /* Adjust note action button size */
+    .note-actions button {
+        width: 28px;
+        height: 28px;
+        font-size: 1em;
+    }
+    .note-actions .delete-permanent-btn,
+    .note-actions .edit-btn,
+    .note-actions .delete-btn {
+        font-size: 0.75em; /* Further reduce font size for text buttons */
+    }
 }
-
