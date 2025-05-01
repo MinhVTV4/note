@@ -25,18 +25,14 @@
             <button id="import-notes-btn" title="Nhập ghi chú, mẫu và sổ tay từ file JSON (Sẽ thay thế toàn bộ dữ liệu hiện tại)">Nhập Notes</button>
             <input type="file" id="import-file-input" accept=".json" class="hidden">
             <button id="settings-btn" title="Mở cài đặt giao diện">Cài đặt</button>
-            <button id="theme-toggle-btn" title=""></button>
-
-        </div>
+            <button id="theme-toggle-btn" title="Chuyển đổi Chế độ Sáng/Tối"></button> </div>
          <div id="archive-status-indicator" class="archive-status hidden">Đang xem các ghi chú đã lưu trữ.</div>
-         <div id="trash-status-indicator" class="archive-status hidden">Đang xem Thùng rác.</div>
+         <div id="trash-status-indicator" class="trash-status hidden">Đang xem Thùng rác.</div>
       </header>
 
     <div id="notebook-tabs-container" class="notebook-tabs">
-        <button class="tab-button active" data-notebook-id="all">Tất cả Ghi chú</button>
-        <button id="add-notebook-tab-btn" class="add-tab-button" title="Thêm Sổ tay mới">+</button>
+        <button class="tab-button active" data-notebook-id="all">Tất cả Ghi chú</button> <button id="add-notebook-tab-btn" class="add-tab-button" title="Thêm Sổ tay mới">+</button>
     </div>
-
 
     <div class="controls-container">
         <input type="search" id="search-input" placeholder="Tìm kiếm ghi chú (tiêu đề, nội dung hoặc #tag)...">
@@ -73,14 +69,12 @@
                     <h3>Danh sách Sổ tay</h3>
                     <div id="notebook-list-container">
                         <p class="empty-state">Chưa có sổ tay nào.</p>
-                    </div>
+                        </div>
                     <button id="show-add-notebook-panel-btn" class="modal-button primary">Tạo Sổ tay Mới</button>
                 </div>
-
                 <div id="notebook-edit-panel" class="hidden">
                     <h3 id="notebook-edit-title">Tạo Sổ tay Mới</h3>
-                    <input type="hidden" id="notebook-edit-id">
-                    <div class="form-group">
+                    <input type="hidden" id="notebook-edit-id"> <div class="form-group">
                         <label for="notebook-edit-name">Tên Sổ tay (bắt buộc):</label>
                         <input type="text" id="notebook-edit-name" placeholder="Ví dụ: Công việc, Cá nhân...">
                     </div>
@@ -107,11 +101,9 @@
                         </div>
                     <button id="show-add-template-panel-btn" class="modal-button primary">Tạo Mẫu Mới</button>
                 </div>
-
                 <div id="template-edit-panel" class="hidden">
                     <h3 id="template-edit-title">Tạo Mẫu Mới</h3>
-                    <input type="hidden" id="template-edit-id">
-                    <div class="form-group">
+                    <input type="hidden" id="template-edit-id"> <div class="form-group">
                         <label for="template-edit-name">Tên Mẫu (bắt buộc):</label>
                         <input type="text" id="template-edit-name" placeholder="Ví dụ: Họp hàng tuần, Ý tưởng Blog...">
                     </div>
@@ -143,12 +135,10 @@
                 <button id="close-settings-modal-btn" class="close-modal-btn" title="Đóng (Esc)" aria-label="Đóng cửa sổ cài đặt">&times;</button>
             </div>
             <div class="modal-body">
-
                 <div class="setting-section">
                     <h3>Chủ đề (Theme)</h3>
                     <div class="theme-options setting-options-grid" role="radiogroup" aria-labelledby="theme-label">
-                        <span id="theme-label" class="sr-only">Chọn chủ đề</span>
-                        <button class="theme-option-btn setting-option-button" data-theme="light" role="radio" aria-checked="false">Sáng</button>
+                        <span id="theme-label" class="sr-only">Chọn chủ đề</span> <button class="theme-option-btn setting-option-button" data-theme="light" role="radio" aria-checked="false">Sáng</button>
                         <button class="theme-option-btn setting-option-button" data-theme="dark" role="radio" aria-checked="false">Tối</button>
                         <button class="theme-option-btn setting-option-button" data-theme="sepia" role="radio" aria-checked="false">Nâu đỏ</button>
                         <button class="theme-option-btn setting-option-button" data-theme="solarized-light" role="radio" aria-checked="false">Solarized Sáng</button>
@@ -158,15 +148,13 @@
                         <button class="theme-option-btn setting-option-button" data-theme="gruvbox-light" role="radio" aria-checked="false">Gruvbox Sáng</button>
                         <button class="theme-option-btn setting-option-button" data-theme="dracula" role="radio" aria-checked="false">Dracula</button>
                         <button class="theme-option-btn setting-option-button" data-theme="monochrome" role="radio" aria-checked="false">Monochrome</button>
-                        </div>
+                    </div>
                 </div>
 
                 <div class="setting-section">
                     <h3>Màu nhấn (Accent Color)</h3>
                      <div class="accent-color-options" role="radiogroup" aria-labelledby="accent-color-label">
-                         <span id="accent-color-label" class="sr-only">Chọn màu nhấn</span>
-                         <button class="color-swatch-btn accent-swatch" data-color="default" title="Mặc định" role="radio" aria-checked="true" style="background-color: #ccc; border: 1px dashed;"></button>
-                         <button class="color-swatch-btn accent-swatch" data-color="#dc3545" title="Đỏ" style="background-color: #dc3545;" role="radio" aria-checked="false"></button>
+                         <span id="accent-color-label" class="sr-only">Chọn màu nhấn</span> <button class="color-swatch-btn accent-swatch" data-color="default" title="Mặc định" role="radio" aria-checked="true" style="background-color: #ccc; border: 1px dashed;"></button> <button class="color-swatch-btn accent-swatch" data-color="#dc3545" title="Đỏ" style="background-color: #dc3545;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#ffc107" title="Vàng" style="background-color: #ffc107;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#198754" title="Xanh lá" style="background-color: #198754;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#6f42c1" title="Tím" style="background-color: #6f42c1;" role="radio" aria-checked="false"></button>
@@ -175,8 +163,8 @@
                          <button class="color-swatch-btn accent-swatch" data-color="#d63384" title="Hồng" style="background-color: #d63384;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#6610f2" title="Chàm (Indigo)" style="background-color: #6610f2;" role="radio" aria-checked="false"></button>
                          <button class="color-swatch-btn accent-swatch" data-color="#a0522d" title="Nâu (Sienna)" style="background-color: #a0522d;" role="radio" aria-checked="false"></button>
-                         </div>
-                 </div>
+                     </div>
+                </div>
 
                 <div class="setting-section">
                      <h3>Font chữ</h3>
@@ -199,15 +187,11 @@
                      <h3>Cỡ chữ Nội dung</h3>
                      <div class="form-group font-size-control">
                          <label for="font-size-slider" class="sr-only">Điều chỉnh tỷ lệ cỡ chữ</label>
-                         <input type="range" id="font-size-slider" min="0.8" max="1.5" step="0.05" value="1">
-                         <span id="font-size-value" aria-live="polite">100%</span>
-                         <button id="reset-font-size-btn" class="modal-button secondary small-button" title="Đặt lại cỡ chữ về mặc định (100%)">Reset</button>
+                         <input type="range" id="font-size-slider" min="0.8" max="1.5" step="0.05" value="1"> <span id="font-size-value" aria-live="polite">100%</span> <button id="reset-font-size-btn" class="modal-button secondary small-button" title="Đặt lại cỡ chữ về mặc định (100%)">Reset</button>
                      </div>
                  </div>
 
-                 </div> </div> </div>
-
-    <script src="script.js" defer></script>
+            </div> </div> </div> <script src="script.js" defer></script>
 
 </body>
 </html>
