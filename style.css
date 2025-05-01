@@ -395,12 +395,12 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     flex-shrink: 0;
-    margin-right: auto; /* Đẩy các nút actions sang phải */
+    margin-right: auto;
 }
 
 .header-actions {
     display: flex;
-    flex-wrap: wrap; /* Cho phép nút bên trong wrap */
+    flex-wrap: wrap; /* Allow button wrapping on smaller screens */
     gap: 8px;
     align-items: center;
     flex-shrink: 0;
@@ -827,20 +827,18 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
     }
     .header-actions {
         gap: 5px;
-        /* UPDATED: Prevent internal button wrapping and allow scroll */
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        /* Optional: Add some padding if scrollbar appears */
-        padding-bottom: 5px;
-        /* Hide scrollbar visually if desired (might affect accessibility) */
-        /* scrollbar-width: none; */ /* Firefox */
+        flex-wrap: nowrap; /* Prevent internal button wrapping */
+        overflow-x: auto; /* Allow horizontal scroll for buttons */
+        padding-bottom: 5px; /* Add padding for scrollbar */
+        /* Optional: Style scrollbar for webkit */
+        /* &::-webkit-scrollbar { height: 4px; } */
+        /* &::-webkit-scrollbar-thumb { background-color: var(--secondary-color); border-radius: 2px;} */
     }
-    /* .header-actions::-webkit-scrollbar { display: none; } */ /* Chrome/Safari/Edge */
 
     .header-actions button {
         padding: 6px 10px;
         font-size: 0.85em;
-        flex-shrink: 0; /* Prevent buttons from shrinking */
+        flex-shrink: 0;
     }
     #theme-toggle-btn {
         min-width: 90px;
