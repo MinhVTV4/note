@@ -1008,12 +1008,13 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
     }
 
 
-    /* --- Điều chỉnh Modal cho Mobile --- */
+    /* --- Điều chỉnh Modal cho Mobile (UPDATED) --- */
     .modal-content {
          padding: 15px 20px; /* Giảm padding trong modal */
-         width: 95%; /* Tăng nhẹ chiều rộng modal so với body */
-         max-height: 95vh; /* Tăng nhẹ max-height */
-         margin: 2.5vh auto; /* Căn giữa với margin nhỏ hơn */
+         width: 90%; /* Giữ nguyên hoặc giảm nhẹ nếu cần */
+         max-width: 90%; /* Thêm max-width để đảm bảo không quá rộng */
+         max-height: 85vh; /* Giảm chiều cao tối đa */
+         margin: 7.5vh auto; /* Tăng margin dọc để đẩy ra xa cạnh màn hình */
     }
     .modal-header h2 {
          font-size: 1.2em; /* Giảm cỡ chữ tiêu đề modal */
@@ -1144,6 +1145,16 @@ body.dark-mode #font-family-select option { background-color: var(--card-bg-colo
      }
      .note-timestamp, .tag-badge {
         font-size: 0.75em;
+     }
+
+     /* Điều chỉnh Modal thêm nữa cho màn hình rất nhỏ */
+     .modal-content {
+         max-height: 90vh; /* Tăng lại chút nếu 85vh quá nhỏ */
+         margin: 5vh auto; /* Giảm margin lại */
+         padding: 10px 15px; /* Giảm padding thêm */
+     }
+      .modal-header h2 {
+         font-size: 1.1em;
      }
 
 }
