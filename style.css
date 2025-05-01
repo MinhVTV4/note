@@ -553,7 +553,25 @@ body {
 
 /* --- Header & Controls --- */
 .app-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-.app-header h1 { margin: 0; font-size: 1.8em; color: var(--primary-color); white-space: nowrap; }
+
+/* Container for Title and Quick Add Button (Removed Quick Add) */
+.title-with-quickadd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title-with-quickadd h1 {
+    margin: 0;
+    font-size: 1.8em;
+    color: var(--primary-color);
+    white-space: nowrap;
+}
+
+/* Quick Add Note Button (Removed) */
+/* #quick-add-note-btn { ... } */
+
+
 .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .header-actions button { padding: 8px 12px; background-color: var(--secondary-color); color: var(--primary-text-color); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; font-size: 0.9em; white-space: nowrap; line-height: 1.4; }
 .header-actions button:hover { opacity: 0.85; }
@@ -794,18 +812,62 @@ body.dark-mode #manage-templates-btn { background-color: #34a4b7; }
 
 
 /* --- Note Edit Mode --- */
-.note input[type="text"].edit-title-input, .note textarea.edit-input, .note input[type="text"].edit-tags-input { display: block; width: calc(100% - 12px); margin-bottom: 10px; border: 1px solid var(--input-border-color); border-radius: 5px; background-color: var(--input-bg-color); color: var(--text-color); font-size: 1em; padding: 5px; cursor: text; position: relative; z-index: 2; font-family: inherit; }
+/* Style chung cho các input/textarea trong chế độ sửa */
+.note input[type="text"].edit-title-input,
+.note textarea.edit-input,
+.note input[type="text"].edit-tags-input,
+.note select.edit-notebook-select /* NEW: Thêm select vào đây */ {
+    display: block;
+    width: calc(100% - 12px); /* Trừ đi padding */
+    margin-bottom: 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg-color);
+    color: var(--text-color);
+    font-size: 1em;
+    padding: 5px;
+    cursor: text;
+    position: relative;
+    z-index: 2;
+    font-family: inherit;
+}
+
 .note input[type="text"].edit-title-input {
     font-weight: 600;
     border-bottom: 1px solid var(--input-border-color);
     padding-bottom: 5px;
     margin-bottom: 10px;
 }
-.note textarea.edit-input { min-height: 80px; resize: vertical; line-height: 1.5; white-space: pre-wrap; margin-top: 0; }
+.note textarea.edit-input {
+    min-height: 80px;
+    resize: vertical;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    margin-top: 0;
+}
 
-.note input:focus, .note textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
-.note input[type="text"].edit-title-input { font-weight: 600; }
-.note textarea.edit-input { min-height: 80px; resize: vertical; line-height: 1.5; white-space: pre-wrap; }
+/* NEW: Style riêng cho dropdown sổ tay trong chế độ sửa */
+.note select.edit-notebook-select {
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    padding: 8px 5px; /* Điều chỉnh padding cho phù hợp */
+    cursor: pointer;
+    margin-top: 5px; /* Khoảng cách với phần tử phía trên (color swatches) */
+}
+
+/* NEW: Style cho container của dropdown (nếu cần thêm margin/padding) */
+.note .edit-notebook-group {
+    margin-bottom: 10px; /* Khoảng cách tới nút Save */
+}
+
+/* Focus style chung cho input, textarea, select trong chế độ sửa */
+.note input:focus,
+.note textarea:focus,
+.note select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25);
+}
+
 
 /* --- Color Selector Styles --- */
 .color-selector-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 12px; padding: 5px 0; position: relative; z-index: 2; }
@@ -845,6 +907,12 @@ mark { background-color: var(--highlight-bg-color); color: var(--highlight-text-
 .note-modal .modal-body { white-space: pre-wrap; }
 .close-modal-btn { background: none; border: none; color: var(--secondary-color); font-size: 28px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
 .close-modal-btn:hover, .close-modal-btn:focus { color: var(--text-color); opacity: 0.8; outline: none; }
+
+/* Quick Add Panel Styles (Removed) */
+/* #quick-add-panel .modal-content { ... } */
+/* #quick-add-textarea { ... } */
+/* #quick-add-panel .panel-actions { ... } */
+
 
 /* --- Auto-save / Manual Save Visual Feedback --- */
 @keyframes flash-border { 0% { box-shadow: 0 0 0 0 rgba(var(--rgb-success-color, 25, 135, 84), 0.5); } 70% { box-shadow: 0 0 0 5px rgba(var(--rgb-success-color, 25, 135, 84), 0); } 100% { box-shadow: 0 0 0 0 rgba(var(--rgb-success-color, 25, 135, 84), 0); } }
