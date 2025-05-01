@@ -736,22 +736,18 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 #notebook-edit-panel input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25); }
 #notebook-edit-panel .panel-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
 
-/* === NEW: Move Note Menu Styles === */
+/* === Move Note Menu Styles === */
 .move-note-menu {
-    position: absolute; /* Định vị tương đối với nút cha */
+    position: absolute;
     background-color: var(--move-menu-bg);
     border: 1px solid var(--move-menu-border);
     border-radius: 4px;
     box-shadow: 0 2px 8px var(--move-menu-shadow);
-    min-width: 150px; /* Chiều rộng tối thiểu */
-    max-height: 200px; /* Chiều cao tối đa, cho phép cuộn */
+    min-width: 150px;
+    max-height: 200px;
     overflow-y: auto;
-    z-index: 10; /* Đảm bảo nằm trên các nút khác */
+    z-index: 10;
     padding: 5px 0;
-    /* Vị trí sẽ được JS tính toán, nhưng có thể đặt mặc định */
-    bottom: 100%; /* Mở lên trên nút */
-    right: 0; /* Căn lề phải với nút */
-    margin-bottom: 5px; /* Khoảng cách với nút */
 }
 .move-note-menu button {
     display: block;
@@ -772,15 +768,14 @@ body.dark-mode .note.note-autosaved, body.dark-mode .note.note-saved-flash { box
 .move-note-menu button.current-notebook {
     font-weight: bold;
     color: var(--primary-color);
-    cursor: default; /* Không cho click vào sổ tay hiện tại */
-    background-color: transparent !important; /* Bỏ hover effect */
+    cursor: default;
+    background-color: transparent !important;
 }
 .move-note-menu hr {
     border: none;
     border-top: 1px solid var(--move-menu-border);
     margin: 5px 0;
 }
-/* =================================== */
 
 
 /* Generic Modal Button Styles */
