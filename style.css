@@ -553,51 +553,7 @@ body {
 
 /* --- Header & Controls --- */
 .app-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-
-/* NEW: Container for Title and Quick Add Button */
-.title-with-quickadd {
-    display: flex; /* Place title and button side-by-side */
-    align-items: center; /* Vertically align them */
-    gap: 10px; /* Space between title and button */
-    /* flex-grow: 1; */ /* Tùy chỉnh nếu cần chiếm không gian */
-}
-
-/* NEW: Adjust h1 margin if needed */
-.title-with-quickadd h1 {
-    margin: 0;
-    font-size: 1.8em;
-    color: var(--primary-color); /* Giữ lại màu cho tiêu đề */
-    white-space: nowrap;
-}
-
-/* NEW: Quick Add Note Button (Lightning Bolt) */
-#quick-add-note-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    font-size: 1.6em; /* Điều chỉnh kích thước */
-    color: #FFC107; /* Màu vàng */
-    cursor: pointer;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-#quick-add-note-btn:hover {
-    transform: scale(1.1);
-    filter: brightness(1.1);
-}
-
-#quick-add-note-btn:focus {
-    outline: none;
-    /* Optional: Add a subtle focus ring */
-    /* box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.5); */
-    /* border-radius: 50%; */
-}
-
-
+.app-header h1 { margin: 0; font-size: 1.8em; color: var(--primary-color); white-space: nowrap; }
 .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .header-actions button { padding: 8px 12px; background-color: var(--secondary-color); color: var(--primary-text-color); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s, opacity 0.2s; font-size: 0.9em; white-space: nowrap; line-height: 1.4; }
 .header-actions button:hover { opacity: 0.85; }
@@ -889,44 +845,6 @@ mark { background-color: var(--highlight-bg-color); color: var(--highlight-text-
 .note-modal .modal-body { white-space: pre-wrap; }
 .close-modal-btn { background: none; border: none; color: var(--secondary-color); font-size: 28px; font-weight: bold; cursor: pointer; padding: 0 5px; line-height: 1; }
 .close-modal-btn:hover, .close-modal-btn:focus { color: var(--text-color); opacity: 0.8; outline: none; }
-
-/* NEW: Specific Styles for Quick Add Panel/Modal */
-/* Sử dụng class .simple-modal trong HTML nếu muốn style khác biệt hẳn */
-/* .simple-modal .modal-content { */
-#quick-add-panel .modal-content {
-    max-width: 450px; /* Nhỏ hơn các modal khác */
-    padding: 15px 20px; /* Padding ít hơn */
-}
-
-#quick-add-textarea {
-    display: block;
-    width: calc(100% - 20px); /* Trừ đi padding của textarea */
-    min-height: 100px;
-    padding: 10px;
-    margin-bottom: 15px; /* Khoảng cách tới nút */
-    border: 1px solid var(--input-border-color);
-    border-radius: 5px;
-    background-color: var(--input-bg-color);
-    color: var(--text-color);
-    font-size: 1em;
-    font-family: inherit;
-    resize: vertical;
-    line-height: 1.5;
-}
-
-#quick-add-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(var(--rgb-primary-color, 0, 123, 255), 0.25);
-}
-
-/* Tái sử dụng .panel-actions cho layout nút */
-#quick-add-panel .panel-actions {
-    margin-top: 0; /* Điều chỉnh nếu cần */
-    padding-top: 0;
-    border-top: none;
-}
-
 
 /* --- Auto-save / Manual Save Visual Feedback --- */
 @keyframes flash-border { 0% { box-shadow: 0 0 0 0 rgba(var(--rgb-success-color, 25, 135, 84), 0.5); } 70% { box-shadow: 0 0 0 5px rgba(var(--rgb-success-color, 25, 135, 84), 0); } 100% { box-shadow: 0 0 0 0 rgba(var(--rgb-success-color, 25, 135, 84), 0); } }
